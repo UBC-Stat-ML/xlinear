@@ -1,68 +1,27 @@
 package xlinear
 
-import org.eclipse.xtend.lib.annotations.Data
-
-
-@Data class SparseMatrix implements Matrix {
+interface SparseMatrix extends Matrix {
+    
+  // note: impl should eventually include diag, band diag, Symmetric, etc
   
   /*
-   * Design decision: we use Colt instead of Math Commons sparse matrices,
+   * Design decision: for first version, use Colt instead of Math Commons sparse matrices,
    * because Math Commons has the artificial restriction that nRows * nCols has to 
    * be smaller than Integer.MAX_VALUE (no matter how sparse it is).
    * Colt can hold up to Integer.LONG_VALUE (but this is poorly documented), which 
    * should be more than enough; for more would need more than int's for rows and cols.
    */
   
-  val cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D implementation
-
-  override int nRows() {
-    implementation.rows
-  }
-
-  override int nCols() {
-    implementation.columns
-  }
+  /**
+   * Efficient traversal of non zero entries. 
+   * 
+   * Specific order at which these entries are visited is up to 
+   * the implementation.
+   */
+  def void visitNonZeroEntries(MatrixEntryVisitor visitor)
+  def SparseMatrix createEmpty(int nRows, int nCols)
+  override SparseMatrix view(int row0Incl, int row1Excl, int col0Incl, int col1Incl)
   
-  override get(int row, int col) {
-    implementation.get(row, col)
-  }
+  def void multiplyInPlace(SparseMatrix another)
   
-  override set(int row, int col, double v) {
-    implementation.set(row, col, v)
-  }
-  
-  
-  
-//  @FunctionalInterface
-//  static interface SparseIterator {
-//    def Double visit(int row, int col, double currentValue);
-//  }
-  
-//  def iterateOnNonZeroEntries(SparseIterator iterator) {
-//    if (implementation.isView)
-//      throw new UnsupportedOperationException
-//    implementation.elements.forEachPair[long key, double value |
-//      val int row = (key / implementation.columns) as int
-//      val int col = (key % implementation.columns) as int
-//      val Double r = iterator.visit(row, col, value)
-//      if (r != null)
-//        
-//      true
-//    ]
-//  }
-//  
-////          if (this.isNoView) {
-////            this.elements.forEachPair(new cern.colt.function.tdouble.LongDoubleProcedure() {
-////                public boolean apply(long key, double value) {
-////                    int i = (int) (key / columns);
-////                    int j = (int) (key % columns);
-////                    double r = function.apply(i, j, value);
-////                    if (r != value)
-////                        elements.put(key, r);
-////                    return true;
-////                }
-////            });
-////        } else {
-////            super.forEachNonZero(function);
-////        }
 }

@@ -1,7 +1,6 @@
 package xlinear
 
-import org.apache.commons.math3.linear.RealMatrix
-import org.apache.commons.math3.linear.SparseRealMatrix
+import org.apache.commons.math3.exception.DimensionMismatchException
 
 /*
  * Design notes
@@ -18,7 +17,7 @@ import org.apache.commons.math3.linear.SparseRealMatrix
  *  - All dense matrix common operations, functions, decompositions
  *  - Views into entries
  *  - Mutability: interfaces used in model building does not allow modif, 
- *      implementations do (so that samplers can be defined)
+ *      implementations do (so that samplers can be defined) <- skip this?
  *  - Basic sparse matrix features (needed for Sparse precision Gaussian)
  *  - Start with MathCommons instead of JBlas for dense
  *      (will need for fallback anyways, and it's 4-5x faster for 2x2 matrices)
@@ -27,14 +26,13 @@ import org.apache.commons.math3.linear.SparseRealMatrix
  * 
  * Not needed in first release:
  *  - Only double storage offered, float less reliable for probabilistic inference
- *  - Complex support not so useful for probabilistic inference?
+ *  - Complex support not so useful for probabilistic inference? also better get them via composition A + i * B
  *  - Avoid separate Vector, SquareMatrix, etc. 
  *    - Type checker is not good enough to cover all cases.
  *    - Marginal utility of having partial coverage. Just check at runtime. 
  *    - Instead, use dispatch functions for dot(.,.), chol(.), etc
  * 
  * Design notes:
- *  - Immutability: 
  *  - Difficulty in previous package is that there are theoretically several axes to pack in the
  *    class hierarchy: (double/float x real/complex) x vec/sqr/general/colVec x storage strategies(dense/sparse/..)
  *    - Type erasure makes it hard to approach in a generic framework
@@ -42,7 +40,7 @@ import org.apache.commons.math3.linear.SparseRealMatrix
  *    - Solution in our case: only the storage strategy axis really matters
  * 
  */
- 
+  
 /**
  * Note: it is not recommended that the user implements this interface
  *   directly, since many operators depend on more detailed knowledge of 
@@ -50,13 +48,15 @@ import org.apache.commons.math3.linear.SparseRealMatrix
  *   or sparse. So we assume at many places a finite number of direct sub-classes 
  *   of this interface.
  * 
- * TODO: add instructions on how to sub-class.
+ * TODO: add instructions on how to sub-class, by using DenseMatrix or SparseMatrix
  */
-interface Matrix {
-	
+interface Matrix { 
+  
+  def Matrix view(int row0Incl, int row1Excl, int col0Incl, int col1Incl) // provide default lazy implementation?
+  
   def int nRows()
   def int nCols()
-  
+
   def double get(int row, int col)
   def void set(int row, int col, double v)
   
@@ -65,59 +65,53 @@ interface Matrix {
    * precision is truncated and implementation is not geared for 
    * high throughput.
    */
-  override String toString()
-  
-  /*
-    Design note: we are with-holding
-      def double get(int rowIndex, int colIndex)
-    Since this would encourage sub-classing Matrix, 
-    which is not the preferred hook for custom sub-classes 
-    Also, it commits to a storage strategy and to is not a 
-    good fit for sparse matrices anyways (might be inefficient).
-    Often time we do not care about individual entries anyways.
-    What matter is operators on matrices.
-  */
-    
-//  def RealMatrix implementation()
-//  
-//  static interface SparseMatrix extends Matrix {
-//  	
-//  	override SparseRealMatrix implementation()
-//  	
-//  }
-//  
-//  lessons learned tonight:
-//    - need dispatch (e.g. normal will have a Matrix precision)
-//    - proposed hierarchy:
-//        ComplexMatrix
-//        final Matrix [with only nRows, nCols, Object impl]; impl can be:
-//          DenseMatrix  [with only a RealMatrix impl]
-//          SparseMatrix [with only a SparseDoubleMatrix impl; eg need .det and x M xt]
-//          
-//    - imp. question: need to think about how this will work for sampler (eg. for a dirichlet-constructed transition matrix)
+  override String toString() // IMPL note: for dense, provide default impl. based on Colt; for sparse just list contents
   
   
-  // this could be dangerous in an init block..; or just inefficient
-  // but this might be ok
-  // also, does commit to double-backed 
-  // also, might be inefficient in sparse cases
-  // def double get(int row, int col)
   
-//  static interface SparseMatrix extends Matrix {
+//  @Data static abstract class DenseMatrixView<T extends DenseMatrixView<T>> implements DenseMatrix<T> {
 //    
-//    // TODO
-//  	
+//     // These will depend on the user implementing visitAllEntries() and visitNonZeroEntries() efficiently
+//    
+//     // Note: do we need a different stuff for Dense and Sparse?
+//    
+//     val DenseMatrix<T> viewed
+//     
+//     val int row0Incl
+//     val int row1Excl
+//     val int col0Incl
+//     val int col1Excl
+//     
+//     override T createEmpty(int nRows, int nCols) {
+//       viewed.createEmpty(nRows, nCols)
+//     }
+//     
+//     override T view(int row0Incl, int row1Excl, int col0Incl, int col1Incl) {
+//       throw new UnsupportedOperationException // TODO
+//     }
+//     
+//     override int nRows() {
+//       row1Excl - row0Incl
+//     }
+//     
+//     override int nCols() {
+//       col1Excl - col0Incl
+//     }
+//     
+//     override double get(int row, int col) {
+//       throw new UnsupportedOperationException // TODO
+//     }
+//     
+//     override set(int row, int col, double v) {
+//       throw new UnsupportedOperationException // TODO
+//     }
+//     
+//     override void multiplyInPlace(T another) {
+//       throw new UnsupportedOperationException // TODO
+//     }
+//     
 //  }
   
-//  static interface DenseDoubleMatrix extends Matrix {
-//    
-//    def double get(int row, int col)
-//    
-//  }
-
-  
-  
-
-
   
 }
+

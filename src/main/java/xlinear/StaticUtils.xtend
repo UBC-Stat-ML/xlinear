@@ -1,7 +1,7 @@
-package xlinear.prototype2
+package xlinear
 
-import xlinear.prototype2.Matrix.SparseMatrix
-import xlinear.prototype2.Matrix.DenseMatrix
+import xlinear.SparseMatrix
+import xlinear.DenseMatrix
 import org.apache.commons.math3.exception.DimensionMismatchException
 
 /*
@@ -20,6 +20,7 @@ import org.apache.commons.math3.exception.DimensionMismatchException
  */
 class StaticUtils {
   
+
   static def SparseMatrix copy(SparseMatrix model) {
     val SparseMatrix result = model.createEmpty(model.nRows, model.nCols)
     model.visitNonZeroEntries[int row, int col, double currentValue |

@@ -12,7 +12,7 @@ import org.apache.commons.math3.linear.AbstractRealMatrix
 
 // make abstract Matrix with as root
 
-import static extension xlinear.MatrixOperations.*
+//import static extension xlinear.MatrixOperations.*
 import org.ojalgo.matrix.store.PhysicalStore
 import org.ojalgo.matrix.store.PrimitiveDenseStore
 import org.ojalgo.random.Weibull
