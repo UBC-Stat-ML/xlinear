@@ -1,8 +1,11 @@
 package xlinear
 
+import org.apache.commons.math3.linear.RealMatrix
+import org.apache.commons.math3.linear.SparseRealMatrix
 
-
-/**
+/*
+ * Design notes
+ * 
  * Objective: a matrix library for the xblang probabilistic programming language.
  * 
  * General design goals:
@@ -39,10 +42,60 @@ package xlinear
  *    - Solution in our case: only the storage strategy axis really matters
  * 
  */
+ 
+/**
+ * Note: it is not recommended that the user implements this interface
+ *   directly, since many operators depend on more detailed knowledge of 
+ *   the implementation for efficiency, in particular if the matrix is dense
+ *   or sparse. So we assume at many places a finite number of direct sub-classes 
+ *   of this interface.
+ * 
+ * TODO: add instructions on how to sub-class.
+ */
 interface Matrix {
 	
   def int nRows()
   def int nCols()
+  
+  def double get(int row, int col)
+  def void set(int row, int col, double v)
+  
+  /**
+   * Human readable output. Not recommended for storing to file as 
+   * precision is truncated and implementation is not geared for 
+   * high throughput.
+   */
+  override String toString()
+  
+  /*
+    Design note: we are with-holding
+      def double get(int rowIndex, int colIndex)
+    Since this would encourage sub-classing Matrix, 
+    which is not the preferred hook for custom sub-classes 
+    Also, it commits to a storage strategy and to is not a 
+    good fit for sparse matrices anyways (might be inefficient).
+    Often time we do not care about individual entries anyways.
+    What matter is operators on matrices.
+  */
+    
+//  def RealMatrix implementation()
+//  
+//  static interface SparseMatrix extends Matrix {
+//  	
+//  	override SparseRealMatrix implementation()
+//  	
+//  }
+//  
+//  lessons learned tonight:
+//    - need dispatch (e.g. normal will have a Matrix precision)
+//    - proposed hierarchy:
+//        ComplexMatrix
+//        final Matrix [with only nRows, nCols, Object impl]; impl can be:
+//          DenseMatrix  [with only a RealMatrix impl]
+//          SparseMatrix [with only a SparseDoubleMatrix impl; eg need .det and x M xt]
+//          
+//    - imp. question: need to think about how this will work for sampler (eg. for a dirichlet-constructed transition matrix)
+  
   
   // this could be dangerous in an init block..; or just inefficient
   // but this might be ok

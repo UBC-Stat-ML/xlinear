@@ -1,3 +1,8 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+apply plugin: "org.xtext.xtend"
+
 buildscript {
   repositories {
     maven { url "https://github.com/ben-manes/gradle-versions-plugin/raw/mvnrepo" }
@@ -21,19 +26,15 @@ buildscript {
   }
 }
 
-
-
-apply plugin: "org.xtext.xtend"
-
 xtend {
-generator{
-javaSourceLevel = 1.8
-}
+  generator{
+    javaSourceLevel = 1.8
+  }
 }
 
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'eclipse'
+dependencies {
+    compile files("lib/Jeigen-onefat.jar")
+}
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.13'
@@ -65,8 +66,6 @@ repositories {
   }
 }
 
-
-
 dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.12'
   compile group: 'junit', name: 'junit', version: '4.12'
@@ -74,6 +73,9 @@ dependencies {
   compile group: 'org.jblas', name: 'jblas', version: '1.2.4'  
   compile 'org.eclipse.xtend:org.eclipse.xtend.lib:2.9.2'
   compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+  compile 'net.sourceforge.parallelcolt:parallelcolt:0.10.0'
+  compile group: 'org.ojalgo', name: 'ojalgo', version: '39.0'
+  compile group: 'net.java.dev.jna', name: 'jna', version: '4.2.2'
 }
 
 task(tutorialj, dependsOn: ['build','testClasses'], type: JavaExec) {
@@ -102,9 +104,6 @@ artifacts {
     archives sourcesJar
     archives javadocJar
 }
-
-
-
 
 if (JavaVersion.current().isJava8Compatible()) {
     allprojects {
