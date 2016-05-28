@@ -1,6 +1,6 @@
 package xlinear
 
-//import static extension xlinear.MatrixOperations.*
+import static extension xlinear.MatrixOperations.*
 import static extension xlinear.RandomMatrices.*
 import java.util.Random
 import org.junit.Test
@@ -12,7 +12,25 @@ import org.junit.Assert
  */
 class AgreementTest {
   
+  @Test
+  def void test() {
+    
+    val double[][] data = #[
+      #[1.5, -45],
+      #[-0.5e-14, 18]
+    ]
+    
+    val Matrix m = StaticUtils::createDenseMatrixByCopyingArrayContents(data)
+    
+    println(m)
+  }
 
+  @Test
+  def void testAddition() {
+    
+    
+    
+  }
   
 //  @Test
 //  def void testNorm() {

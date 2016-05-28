@@ -5,10 +5,8 @@ import com.google.common.base.Stopwatch
 import java.util.concurrent.TimeUnit
 import org.apache.commons.math3.linear.RealMatrix
 import org.apache.commons.math3.linear.BlockRealMatrix
-import org.apache.commons.math3.linear.Array2DRowRealMatrix
-import org.apache.commons.math3.linear.AbstractRealMatrix
 
-//import static extension xlinear.MatrixOperators
+import static extension xlinear.MatrixOperations.*
 
 // make abstract Matrix with as root
 
@@ -81,8 +79,8 @@ class Demo {
     
 //    println(m1)
     
-    val size = 200
-    val rep = 100
+    val size = 2
+    val rep = 1000000
     
     for (var j = 0; j < 3; j++) {
       val test = DoubleMatrix::zeros(size,size)
@@ -137,14 +135,14 @@ class Demo {
         test2.multiply(test2)
       println(watch.elapsed(TimeUnit::MILLISECONDS)) 
       
-//      println("us")
-//      
-//      var m1 = matrix(#[#[1, 2], #[3, 4]])
-//      
-//      watch = Stopwatch::createStarted
-//      for (var i = 0; i < 10; i++)
-//        m1 * m1
-//      println(watch.elapsed(TimeUnit::MILLISECONDS)) 
+      println("us")
+      
+      var m1 = StaticUtils::createEmptyDenseMatrix(size, size)
+      
+      watch = Stopwatch::createStarted
+      for (var i = 0; i < rep; i++)
+        m1 * m1 
+      println(watch.elapsed(TimeUnit::MILLISECONDS)) 
       
       
       println("ojAlgo")

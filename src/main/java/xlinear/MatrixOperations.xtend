@@ -137,7 +137,23 @@ class MatrixOperations {
   
   //////// Rest of the file defines +, -, * 
   
-    // TODO: missing matrix multiplication!
+  //// Matrix multiplication
+  
+  def dispatch static DenseMatrix *(DenseMatrix matrix1, DenseMatrix matrix2) {
+    matrix1.multiplyTo(matrix2)
+  }
+  
+  def dispatch static SparseMatrix *(SparseMatrix matrix1, SparseMatrix matrix2) {
+    matrix1.multiplyTo(matrix2)
+  }
+  
+  def dispatch static SparseMatrix *(SparseMatrix matrix1, DenseMatrix matrix2) {
+    StaticUtils::multiply(matrix1, matrix2)
+  }
+  
+  def dispatch static SparseMatrix *(DenseMatrix matrix1, SparseMatrix matrix2) {
+    StaticUtils::multiply(matrix1, matrix2)
+  }
   
   //// Matrix additions
   

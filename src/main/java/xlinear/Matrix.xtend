@@ -60,12 +60,7 @@ interface Matrix {
   def double get(int row, int col)
   def void set(int row, int col, double v)
   
-  /**
-   * Human readable output. Not recommended for storing to file as 
-   * precision is truncated and implementation is not geared for 
-   * high throughput.
-   */
-  override String toString() // IMPL note: for dense, provide default impl. based on Colt; for sparse just list contents
+
   
   
   

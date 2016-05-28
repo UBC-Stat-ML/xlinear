@@ -1,5 +1,8 @@
 package xlinear
 
+import xlinear.internals.MatrixVisitorViewOnly
+import xlinear.internals.MatrixVisitorEditInPlace
+
 interface SparseMatrix extends Matrix {
     
   // note: impl should eventually include diag, band diag, Symmetric, etc
@@ -18,10 +21,12 @@ interface SparseMatrix extends Matrix {
    * Specific order at which these entries are visited is up to 
    * the implementation.
    */
-  def void visitNonZeroEntries(MatrixEntryVisitor visitor)
+  def void visitNonZeros(MatrixVisitorViewOnly visitor)
+  def void editNonZerosInPlace(MatrixVisitorEditInPlace visitor)
+  
   def SparseMatrix createEmpty(int nRows, int nCols)
   override SparseMatrix view(int row0Incl, int row1Excl, int col0Incl, int col1Incl)
   
-  def void multiplyInPlace(SparseMatrix another)
+  def SparseMatrix multiplyTo(SparseMatrix another)
   
 }

@@ -1,5 +1,9 @@
 package xlinear
 
+import xlinear.internals.MatrixVisitorViewOnly
+import xlinear.internals.MatrixVisitorEditInPlace
+import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D
+
 interface DenseMatrix extends Matrix {
     
   // note: impl should eventually include Symmetric, etc
@@ -10,14 +14,11 @@ interface DenseMatrix extends Matrix {
    * Specific order at which these entries are visited is up to 
    * the implementation.
    */
-  def void visitAllEntries(MatrixEntryVisitor visitor)
+  def void visit(MatrixVisitorViewOnly visitor)
+  def void editInPlace(MatrixVisitorEditInPlace visitor)
+  
   def DenseMatrix createEmpty(int nRows, int nCols)
-  override DenseMatrix view(int row0Incl, int row1Excl, int col0Incl, int col1Incl)
+  override DenseMatrix view(int row0Incl, int row1Excl, int col0Incl, int col1Incl) 
   
-  // Note: DenseMatrix can be easily made into the specialized type of interest at a 
-  // cost negligible compared to matrix mult
-  def void multiplyInPlace(DenseMatrix another)
-  
-  // mixed sparse-dense still need to be manually created though
-
+  def DenseMatrix multiplyTo(DenseMatrix another) 
 }
