@@ -3,6 +3,8 @@ package xlinear.internals
 import xlinear.SparseMatrix
 import org.eclipse.xtend.lib.annotations.Data
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D
+import java.util.Locale
+import xlinear.StaticUtils
 
 @Data class ColtSparseMatrix implements SparseMatrix {
   
@@ -41,20 +43,24 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D
     }
   }
   
-  override nRows() {
+  override int nRows() {
     return implementation.rows
   }
   
-  override nCols() {
+  override int nCols() {
     return implementation.columns
   }
   
-  override get(int row, int col) {
+  override double get(int row, int col) {
     implementation.get(row, col)
   }
   
-  override set(int row, int col, double v) {
+  override void set(int row, int col, double v) {
     implementation.set(row, col, v)
   }
   
+  override String toString() {
+    // TODO: use views to truncate
+    return StaticUtils::toStringDimensions(this) + " sparse matrix\n" + StaticUtils::toString(this)
+  }
 }

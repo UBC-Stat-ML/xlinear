@@ -3,10 +3,30 @@ package xlinear
 import xlinear.DenseMatrix
 import xlinear.SparseMatrix
 import xlinear.StaticUtils
+import javax.naming.OperationNotSupportedException
 
 class MatrixOperations {
   
-  //// Copy
+  //// Empty matrix creation
+  
+  def static Matrix zeros(int nRows, int nCols, boolean sparse) {
+    if (sparse) sparse(nRows, nCols) else dense(nRows, nCols)
+  }
+  
+  def static DenseMatrix zeros(int nRows, int nCols) {
+    dense(nRows, nCols)
+  }
+  
+  def static DenseMatrix dense(int nRows, int nCols) {
+    StaticUtils::createEmptyDenseMatrix(nRows, nCols)
+  }
+  
+  def static SparseMatrix sparse(int nRows, int nCols) {
+    StaticUtils::createEmptySparseMatrix(nRows, nCols)
+  }
+  
+  
+  //// Creating matrices by copying
   
   def dispatch static SparseMatrix copy(SparseMatrix model) {
     StaticUtils::copy(model)
@@ -16,90 +36,39 @@ class MatrixOperations {
     StaticUtils::copy(model)
   }
   
+  def static DenseMatrix denseCopy(double[][] data) {
+    StaticUtils::createDenseMatrixByCopyingArrayContents(data)
+  }
+
+  def static DenseMatrix denseCopy(Matrix matrix) {
+    val DenseMatrix result = dense(matrix.nRows, matrix.nCols)
+    result += matrix
+    return result
+  }
   
-//    //// Norms
-//  
-//  /**
-//   * L2 norm of a vector or matrix (in which case it is also known 
-//   * as the Frobenius norm).
-//   */
-//  def dispatch static double norm(DenseMatrix m) {
-//    m.implementation.frobeniusNorm
-//  } 
-//   
-//  def dispatch static double norm(SparseMatrix m) {
-//    val double [] sum = newDoubleArrayOfSize(1)
-//    m.implementation.elements.forEachPair[long key, double value |
-//      sum.set(0, sum.get(0) + value * value)
-//      true
-//    ]
-//    Math.sqrt(sum.get(0))
-//  }
-//  
-//  def dispatch static double norm(Matrix m) {
-//    throw notImplemented("norm", m)
-//  }
-//
-//  
-//  //// Matrix creation
-//  
-//  def static Matrix zeros(int nRows, int nCols, boolean sparse) {
-//    if (sparse)
-//      sparse(nRows, nCols)
-//    else
-//      zeros(nRows, nCols)
-//  }
-//  
-//  def static DenseMatrix zeros(int nRows, int nCols) {
-//    adapt(new BlockRealMatrix(nRows, nCols))
-//  }
-//  
-//  def static DenseMatrix dense(int nRows, int nCols) {
-//    zeros(nRows, nCols)
-//  }
-//  
-//  def static SparseMatrix sparse(int nRows, int nCols) {
-//    adapt(new SparseDoubleMatrix2D(nRows, nCols))
-//  }
-//  
-//
-//  //// Matrix creation by copying another one
-//  
-//  def static DenseMatrix denseCopy(Matrix matrix) {
-//    val result = dense(matrix.nRows, matrix.nCols)
-//    result.implementation.walkInOptimizedOrder(new RealMatrixChangingVisitor() {
-//      override end() { 0.0 }
-//      override start(int rows, int columns, int startRow, int endRow, int startColumn, int endColumn) {}
-//      override visit(int row, int column, double value) {
-//        matrix.get(row, column)
-//      }
-//    })
-//    result
-//  }
-//  
-//  def dispatch static SparseMatrix sparseCopy(SparseMatrix matrix) {
-//    val result = sparse(matrix.nRows, matrix.nCols)
-//    matrix.implementation.forEachNonZero[int row, int col, double value |
-//      result.set(row, col, value)
-//      value
-//    ]
-//    result
-//  }
-//  
-//  def dispatch static SparseMatrix sparseCopy(Matrix matrix) {
-//    throw notImplemented("sparseCopy", matrix)
-//  }
-//
-//  
-//  //// Wrapping implementations into our types
-//  
-//  def static DenseMatrix adapt(RealMatrix impl) {
-//    new DenseMatrix(impl)
-//  }
-//  
-//  def static SparseMatrix adapt(SparseDoubleMatrix2D impl) {
-//    new SparseMatrix(impl)
-//  }
+  def static SparseMatrix sparseCopy(double[][] data) {
+    StaticUtils::createSparseMatrixByCopyingArrayContents(data)
+  }
+  
+  def static SparseMatrix sparseCopy(Matrix matrix) {
+    val SparseMatrix result = sparse(matrix.nRows, matrix.nCols)
+    result += matrix
+    return result
+  }
+  
+  
+  //// Norms
+  
+  /**
+   * L2 norm of a vector or matrix (in the matrix case it is also known 
+   * as the Frobenius norm).
+   */
+  def static double norm(Matrix m) {
+    StaticUtils::norm(m)
+  } 
+   
+
+
 
 //  //// Matrix inversion
 //  
@@ -135,7 +104,7 @@ class MatrixOperations {
 //  }
   
   
-  //////// Rest of the file defines +, -, * 
+  //////// Rest of the file defines +, -, *, +=, -=, *= 
   
   //// Matrix multiplication
   
@@ -154,6 +123,12 @@ class MatrixOperations {
   def dispatch static SparseMatrix *(DenseMatrix matrix1, SparseMatrix matrix2) {
     StaticUtils::multiply(matrix1, matrix2)
   }
+
+  @Deprecated
+  def static dispatch void *=(Matrix m1, Matrix m2) {
+    throw new OperationNotSupportedException(
+      "Matrix multiplication cannot be computed more efficiently in place. Use C = A * B; A = C;")
+  }
   
   //// Matrix additions
   
@@ -161,16 +136,8 @@ class MatrixOperations {
     StaticUtils::add(matrix1, matrix2)
   }
   
-  def dispatch static void +=(DenseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::addInPlace(matrix1, matrix2)
-  }
-  
   def dispatch static SparseMatrix +(SparseMatrix matrix1, SparseMatrix matrix2) {
     StaticUtils::add(matrix1, matrix2)
-  } 
-  
-  def dispatch static void +=(SparseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::addInPlace(matrix1, matrix2)
   } 
   
   /*
@@ -182,13 +149,23 @@ class MatrixOperations {
     StaticUtils::add(matrix1, matrix2)
   }
   
-  // corresponding += in place not defined for the above design note reason
-  
   def dispatch static DenseMatrix +(DenseMatrix matrix1, SparseMatrix matrix2) {
     StaticUtils::add(matrix2, matrix1) // ! note: using commutativity of + here
   }
   
+  def dispatch static void +=(DenseMatrix matrix1, DenseMatrix matrix2) {
+    StaticUtils::addInPlace(matrix1, matrix2)
+  }
+  
+  def dispatch static void +=(SparseMatrix matrix1, SparseMatrix matrix2) {
+    StaticUtils::addInPlace(matrix1, matrix2)
+  } 
+  
   def dispatch static void +=(DenseMatrix matrix1, SparseMatrix matrix2) {
+    StaticUtils::addInPlace(matrix1, matrix2)
+  }
+  
+  def dispatch static void +=(SparseMatrix matrix1, DenseMatrix matrix2) {
     StaticUtils::addInPlace(matrix1, matrix2)
   }
   
@@ -203,14 +180,6 @@ class MatrixOperations {
     StaticUtils::scale(m, scalar.doubleValue)
   }
   
-  def dispatch static void *=(DenseMatrix m, Number scalar) {
-    StaticUtils::scaleInPlace(m, scalar.doubleValue)
-  }
-  
-  def dispatch static void *=(Number scalar, DenseMatrix m) {
-    StaticUtils::scaleInPlace(m, scalar.doubleValue)
-  }
-  
   def dispatch static SparseMatrix *(SparseMatrix m, Number scalar) {
     StaticUtils::scale(m, scalar.doubleValue)
   }
@@ -219,14 +188,14 @@ class MatrixOperations {
     StaticUtils::scale(m, scalar.doubleValue)
   }
   
+  def dispatch static void *=(DenseMatrix m, Number scalar) {
+    StaticUtils::scaleInPlace(m, scalar.doubleValue)
+  }
+  
   def dispatch static void *=(SparseMatrix m, Number scalar) {
     StaticUtils::scaleInPlace(m, scalar.doubleValue)
   }
-  
-  def dispatch static void *=(Number scalar, SparseMatrix m) {
-    StaticUtils::scaleInPlace(m, scalar.doubleValue)
-  }
-  
+
   
   //// subtraction 
   
@@ -254,9 +223,11 @@ class MatrixOperations {
     StaticUtils::subtractInPlace(matrix1, matrix2)
   }
   
-  // -=(SparseMatrix matrix1, DenseMatrix matrix2) skipped for same reason as corresp. +=
-
   def dispatch static void -=(DenseMatrix matrix1, SparseMatrix matrix2) {
+    StaticUtils::subtractInPlace(matrix1, matrix2)
+  }
+  
+  def dispatch static void -=(SparseMatrix matrix1, DenseMatrix matrix2) {
     StaticUtils::subtractInPlace(matrix1, matrix2)
   }
   

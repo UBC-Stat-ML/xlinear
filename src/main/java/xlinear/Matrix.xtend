@@ -60,9 +60,6 @@ interface Matrix {
   def double get(int row, int col)
   def void set(int row, int col, double v)
   
-
-  
-  
   
 //  @Data static abstract class DenseMatrixView<T extends DenseMatrixView<T>> implements DenseMatrix<T> {
 //    

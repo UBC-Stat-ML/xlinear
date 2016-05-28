@@ -5,6 +5,8 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.apache.commons.math3.linear.BlockRealMatrix
 import org.apache.commons.math3.linear.RealMatrixChangingVisitor
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D
+import java.util.Locale
+import xlinear.StaticUtils
 
 @Data class CommonsDenseMatrix implements DenseMatrix {
   
@@ -65,11 +67,8 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D
   }
   
   override String toString() {
-    val DenseDoubleMatrix2D coltImpl = new DenseDoubleMatrix2D(nRows, nCols)
-    visit[int row, int col, double value |
-      coltImpl.set(row, col, value)
-    ]
-    coltImpl.toString()
+    // TODO: use views to truncate
+    return StaticUtils::toStringDimensions(this) + " dense matrix\n" + StaticUtils::toString(this)
   }
   
 }

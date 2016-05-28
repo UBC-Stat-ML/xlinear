@@ -4,6 +4,17 @@ import xlinear.SparseMatrix
 import org.apache.commons.math3.exception.DimensionMismatchException
 import xlinear.internals.CommonsDenseMatrix
 import org.apache.commons.math3.linear.BlockRealMatrix
+import xlinear.internals.ColtSparseMatrix
+import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D
+import cern.colt.matrix.tdouble.algo.DoubleFormatter
+import java.util.Locale
+import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D
+import xlinear.internals.MatrixVisitorViewOnly
+import org.eclipse.xtend.lib.annotations.Data
+import java.util.HashMap
+import java.util.List
+import xlinear.internals.TablePrettyPrinter
+import org.apache.commons.math3.exception.NotStrictlyPositiveException
 
 /*
  * Static utilities, which, in contrast to those in MatrixOperations, 
@@ -21,12 +32,37 @@ import org.apache.commons.math3.linear.BlockRealMatrix
  */
 class StaticUtils {
   
+  //// copy, etc
+  
   static def DenseMatrix createDenseMatrixByCopyingArrayContents(double [][] data) {
     return new CommonsDenseMatrix(new BlockRealMatrix(data))
   }
   
+  static def SparseMatrix createSparseMatrixByCopyingArrayContents(double [][] data) {
+    val int nRows = data.length
+    val int nCols = data.get(0).length
+    if (nRows < 1) throw new NotStrictlyPositiveException(nRows);
+    if (nCols < 1) throw new NotStrictlyPositiveException(nCols);
+    val SparseMatrix result = createEmptySparseMatrix(nRows, nCols)
+    for (var int row = 0; row < nRows; row++) {
+      val double[] rowArray = data.get(row)
+      if (rowArray.length != nCols)
+        throw new DimensionMismatchException(data.get(row).length, nCols)
+      for (var int col = 0; col < nCols; col++) {
+        val current = rowArray.get(col)
+        if (current != 0.0)
+          result.set(row, col, current)
+      }
+    }  
+    return result
+  }
+  
   static def DenseMatrix createEmptyDenseMatrix(int nRows, int nCols) {
     return new CommonsDenseMatrix(new BlockRealMatrix(nRows, nCols))
+  }
+  
+  static def SparseMatrix createEmptySparseMatrix(int nRows, int nCols) {
+    return new ColtSparseMatrix(new SparseDoubleMatrix2D(nRows, nCols))
   }
 
   static def SparseMatrix copy(SparseMatrix model) {
@@ -44,6 +80,70 @@ class StaticUtils {
     ]
     return result
   }
+  
+//  def static resetTo(SparseMatrix src, DenseMatrix dest) {
+//    // set dest to zero
+//    dest.editInPlace[int row, int col, double value | 0.0]
+//    // write to it the nonzeros or src
+//    src.visitNonZeros[int row, int col, double value | dest.set(row, col, value)]
+//  }
+  
+  
+  //// toString
+  
+  /**
+   * Human-readable multi-line tabulated string for the provided matrix.
+   * Since numbers are rounded and the method is not designed for efficiency, 
+   * do not use to record matrices to file.
+   */
+  static def String toString(Matrix matrix) {
+    val printer = new TablePrettyPrinter
+    for (var int row = 0; row < matrix.nRows; row++)
+      printer.set(1 + row, 0, "" + row + " | ")
+    for (var int col = 0; col < matrix.nCols; col++) {
+      printer.set(0, 1 + 2*col, "" + col)
+      printer.makeJustificationToLeft(1 + 2*col + 1)
+    }
+    visitSkippingSomeZeros(matrix)[int row, int col, double value |
+      val String str = String.format(Locale.US, "%G", value)
+      val int dotLocation = str.indexOf('.')
+      val prefix = if (dotLocation == -1) str else str.subSequence(0, dotLocation)
+      val suffix = if (dotLocation == -1) ""  else str.subSequence(dotLocation, str.length)
+      printer.set(1 + row, 1 + 2*col + 0, "  " + prefix.toString)
+      printer.set(1 + row, 1 + 2*col + 1, suffix.toString)
+    ]
+    printer.toString("")
+  }
+  
+  static def String toStringDimensions(Matrix matrix) {
+    return "" + matrix.nRows + " x " + matrix.nCols
+  }
+  
+  //// Utilities to iterate over matrices
+  
+  /**
+   * Iterate over entries of the matrix, where zeros may or may not be skipped 
+   * depending on the runtime type of the matrix (sparse vs dense)
+   */
+  static def void visitSkippingSomeZeros(Matrix matrix, MatrixVisitorViewOnly visitor) {
+    switch matrix {
+      SparseMatrix : matrix.visitNonZeros(visitor)
+      DenseMatrix  : matrix.visit(visitor)
+      default      : throw denseOrSparseException
+    }
+  }
+  
+  //// Norms
+  
+  static def double norm(Matrix matrix) {
+    val double[] sum = #[0.0]
+    visitSkippingSomeZeros(matrix) [int row, int col, double value |
+      sum.set(0, sum.get(0) + value * value)
+    ]
+    return Math.sqrt(sum.get(0))
+  }
+  
+  //// Below are support methods for +,-,*
   
   static def SparseMatrix multiply(SparseMatrix sparse, DenseMatrix dense) {
     checkMatrixMultiplicationDimensionsMatch(sparse, dense)
@@ -112,9 +212,6 @@ class StaticUtils {
     return result
   }
   
-  /**
-   * destination += source when the source is a sparse matrix
-   */
   static def void addInPlace(Matrix destination, SparseMatrix source) {
     if (destination === source) { 
       // avoid iterating over an object being modified in case this leads to weird behavior 
@@ -127,6 +224,15 @@ class StaticUtils {
     // in contrast to the the dense case, we need to iterate over the source
     source.visitNonZeros[int row, int col, double currentValue |
       destination.set(row, col, currentValue + destination.get(row, col))
+    ]
+  }
+  
+  static def void addInPlace(SparseMatrix destination, DenseMatrix source) {
+    if (destination === source) 
+      throw notBothSparseAndDense
+    checkSizesEqual(destination, source)
+    source.visit[int row, int col, double value |
+      increment(destination, row, col, value)
     ]
   }
   
@@ -166,45 +272,51 @@ class StaticUtils {
     addInPlace(matrix1, scale(matrix2, -1.0))
   }
   
-  // subtractInPlace(SparseMatrix matrix1, DenseMatrix matrix2) omitted
-  // since the resulting matrix will not be sparse
+  static def void subtractInPlace(SparseMatrix matrix1, DenseMatrix matrix2) {
+    addInPlace(matrix1, scale(matrix2, -1.0))
+  }
 
   static def void subtractInPlace(DenseMatrix matrix1, SparseMatrix matrix2) {
     addInPlace(matrix1, scale(matrix2, -1.0))
   }
   
   static def DenseMatrix subtract(DenseMatrix matrix1, DenseMatrix matrix2) {
-    subtract(matrix1, scale(matrix2, -1.0))
+    add(matrix1, scale(matrix2, -1.0))
   }
   
   static def SparseMatrix subtract(SparseMatrix matrix1, SparseMatrix matrix2) {
-    subtract(matrix1, scale(matrix2, -1.0))
+    add(matrix1, scale(matrix2, -1.0))
   }
   
   static def DenseMatrix subtract(SparseMatrix matrix1, DenseMatrix matrix2) {
-    subtract(matrix1, scale(matrix2, -1.0))
+    add(matrix1, scale(matrix2, -1.0))
   }
   
   static def DenseMatrix subtract(DenseMatrix matrix1, SparseMatrix matrix2) {
-    subtract(matrix1, scale(matrix2, -1.0))
+    add(scale(matrix2, -1.0), matrix1)
   }
   
-  def static checkMatrixMultiplicationDimensionsMatch(Matrix matrix1, Matrix matrix2) {
+  
+  //// Utilities for exception handling
+  
+  def private static checkMatrixMultiplicationDimensionsMatch(Matrix matrix1, Matrix matrix2) {
     if (matrix1.nCols != matrix2.nRows)
       throw new DimensionMismatchException(matrix1.nCols, matrix2.nRows)
   }
   
-  def static checkSizesEqual(Matrix matrix1, Matrix matrix2) {
+  def private static checkSizesEqual(Matrix matrix1, Matrix matrix2) {
     if (matrix1.nRows != matrix2.nRows || 
         matrix1.nCols != matrix2.nCols)
       throw sizesNoteEqualException(matrix1, matrix2)
   }
   
-  def static sizesNoteEqualException(Matrix matrix1, Matrix matrix2) {
+  def private static sizesNoteEqualException(Matrix matrix1, Matrix matrix2) {
     if (matrix1.nRows != matrix2.nRows)
       new DimensionMismatchException(matrix1.nRows, matrix2.nRows)
     else
       new DimensionMismatchException(matrix1.nCols, matrix2.nCols)
   }
   
+  val static denseOrSparseException = new RuntimeException("Either a SparseMatrix or DenseMatrix required.")
+  val static notBothSparseAndDense = new RuntimeException("A matrix should not be both a SparseMatrix and a DenseMatrix")
 }

@@ -20,6 +20,9 @@ interface SparseMatrix extends Matrix {
    * 
    * Specific order at which these entries are visited is up to 
    * the implementation.
+   * 
+   * We assume the visits are done sequentially (refactor at some 
+   * point with the Stream framework to give choice in future?)
    */
   def void visitNonZeros(MatrixVisitorViewOnly visitor)
   def void editNonZerosInPlace(MatrixVisitorEditInPlace visitor)
