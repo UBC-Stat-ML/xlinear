@@ -12,7 +12,7 @@ import org.apache.commons.math3.exception.DimensionMismatchException
 /** 
  * Systematic check of all combinations of sparse/dense/scalar +, -, +=, -=, *, *=
  */
-class SystematicOperationsTest {
+class OperationsTest {
   
   @Test
   def void testPlusMinusScale() {
