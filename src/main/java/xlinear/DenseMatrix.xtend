@@ -18,7 +18,6 @@ interface DenseMatrix extends Matrix {
   def void editInPlace(MatrixVisitorEditInPlace visitor)
   
   def DenseMatrix createEmpty(int nRows, int nCols)
-  override DenseMatrix view(int row0Incl, int row1Excl, int col0Incl, int col1Incl) 
   
   def DenseMatrix multiplyTo(DenseMatrix another) 
 }

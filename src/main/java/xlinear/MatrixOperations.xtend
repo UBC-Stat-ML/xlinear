@@ -35,6 +35,10 @@ class MatrixOperations {
     StaticUtils::copy(model)
   }
   
+  def dispatch static DenseMatrix copy(double[][] data) {
+    StaticUtils::createDenseMatrixByCopyingArrayContents(data)
+  }
+  
   def static DenseMatrix denseCopy(double[][] data) {
     StaticUtils::createDenseMatrixByCopyingArrayContents(data)
   }

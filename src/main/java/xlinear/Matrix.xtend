@@ -60,50 +60,8 @@ interface Matrix {
   def double get(int row, int col)
   def void set(int row, int col, double v)
   
-  
-//  @Data static abstract class DenseMatrixView<T extends DenseMatrixView<T>> implements DenseMatrix<T> {
-//    
-//     // These will depend on the user implementing visitAllEntries() and visitNonZeroEntries() efficiently
-//    
-//     // Note: do we need a different stuff for Dense and Sparse?
-//    
-//     val DenseMatrix<T> viewed
-//     
-//     val int row0Incl
-//     val int row1Excl
-//     val int col0Incl
-//     val int col1Excl
-//     
-//     override T createEmpty(int nRows, int nCols) {
-//       viewed.createEmpty(nRows, nCols)
-//     }
-//     
-//     override T view(int row0Incl, int row1Excl, int col0Incl, int col1Incl) {
-//       throw new UnsupportedOperationException // TODO
-//     }
-//     
-//     override int nRows() {
-//       row1Excl - row0Incl
-//     }
-//     
-//     override int nCols() {
-//       col1Excl - col0Incl
-//     }
-//     
-//     override double get(int row, int col) {
-//       throw new UnsupportedOperationException // TODO
-//     }
-//     
-//     override set(int row, int col, double v) {
-//       throw new UnsupportedOperationException // TODO
-//     }
-//     
-//     override void multiplyInPlace(T another) {
-//       throw new UnsupportedOperationException // TODO
-//     }
-//     
-//  }
-  
+  // TODO: offer implementations of equals, hashcode (use visitSkipSomeZeros? which you may want to add here in interface, or not needed actually)
+  // TODO: same for toString, with options to limit # of entries
   
 }
 

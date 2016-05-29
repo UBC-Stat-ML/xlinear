@@ -28,7 +28,6 @@ interface SparseMatrix extends Matrix {
   def void editNonZerosInPlace(MatrixVisitorEditInPlace visitor)
   
   def SparseMatrix createEmpty(int nRows, int nCols)
-  override SparseMatrix view(int row0Incl, int row1Excl, int col0Incl, int col1Incl)
   
   def SparseMatrix multiplyTo(SparseMatrix another)
   

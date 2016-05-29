@@ -3,7 +3,6 @@ package xlinear.internals
 import xlinear.SparseMatrix
 import org.eclipse.xtend.lib.annotations.Data
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D
-import java.util.Locale
 import xlinear.StaticUtils
 
 @Data class ColtSparseMatrix implements SparseMatrix {
@@ -53,10 +52,12 @@ import xlinear.StaticUtils
   }
   
   override double get(int row, int col) {
+    StaticUtils::checkBounds(this, row, col)
     implementation.get(row, col)
   }
   
   override void set(int row, int col, double v) {
+    StaticUtils::checkBounds(this, row, col)
     implementation.set(row, col, v)
   }
   

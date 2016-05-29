@@ -10,6 +10,8 @@ import java.util.Locale
 import xlinear.internals.MatrixVisitorViewOnly
 import xlinear.internals.TablePrettyPrinter
 import org.apache.commons.math3.exception.NotStrictlyPositiveException
+import org.apache.commons.math3.exception.OutOfRangeException
+import org.apache.commons.math3.exception.util.LocalizedFormats
 
 /*
  * Static utilities, which, in contrast to those in MatrixOperations, 
@@ -293,6 +295,18 @@ class StaticUtils {
   
   
   //// Utilities for exception handling
+  
+  def static void checkBounds(Matrix m, int row, int col) {
+    if (row < 0 || row >= m.nRows) throw outOfRangeException(row, m.nRows - 1, true)
+    if (col < 0 || col >= m.nCols) throw outOfRangeException(col, m.nCols - 1, false)
+  }
+  
+  def static OutOfRangeException outOfRangeException(int index, int max, boolean isRow) {
+    return new OutOfRangeException(
+      if (isRow) LocalizedFormats.ROW_INDEX else LocalizedFormats.COLUMN_INDEX, 
+      index, 0, max
+    )
+  }
   
   def static checkMatrixMultiplicationDimensionsMatch(Matrix matrix1, Matrix matrix2) {
     if (matrix1.nCols != matrix2.nRows)
