@@ -32,6 +32,7 @@ import xlinear.StaticUtils
   }
   
   override ColtSparseMatrix multiplyTo(SparseMatrix another) {
+    StaticUtils::checkMatrixMultiplicationDimensionsMatch(this, another)
     // TODO: if big, attempt JEigen?
     switch another {
       ColtSparseMatrix : {

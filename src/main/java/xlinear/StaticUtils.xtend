@@ -6,13 +6,8 @@ import xlinear.internals.CommonsDenseMatrix
 import org.apache.commons.math3.linear.BlockRealMatrix
 import xlinear.internals.ColtSparseMatrix
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D
-import cern.colt.matrix.tdouble.algo.DoubleFormatter
 import java.util.Locale
-import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D
 import xlinear.internals.MatrixVisitorViewOnly
-import org.eclipse.xtend.lib.annotations.Data
-import java.util.HashMap
-import java.util.List
 import xlinear.internals.TablePrettyPrinter
 import org.apache.commons.math3.exception.NotStrictlyPositiveException
 
@@ -299,7 +294,7 @@ class StaticUtils {
   
   //// Utilities for exception handling
   
-  def private static checkMatrixMultiplicationDimensionsMatch(Matrix matrix1, Matrix matrix2) {
+  def static checkMatrixMultiplicationDimensionsMatch(Matrix matrix1, Matrix matrix2) {
     if (matrix1.nCols != matrix2.nRows)
       throw new DimensionMismatchException(matrix1.nCols, matrix2.nRows)
   }
@@ -310,11 +305,15 @@ class StaticUtils {
       throw sizesNoteEqualException(matrix1, matrix2)
   }
   
-  def private static sizesNoteEqualException(Matrix matrix1, Matrix matrix2) {
+  def private static DimensionMismatchException sizesNoteEqualException(Matrix matrix1, Matrix matrix2) {
     if (matrix1.nRows != matrix2.nRows)
-      new DimensionMismatchException(matrix1.nRows, matrix2.nRows)
+      return dimensionMismatchException(matrix1.nRows, matrix2.nRows)
     else
-      new DimensionMismatchException(matrix1.nCols, matrix2.nCols)
+      return dimensionMismatchException(matrix1.nCols, matrix2.nCols)
+  }
+  
+  def private static DimensionMismatchException dimensionMismatchException(int d1, int d2) {
+    new DimensionMismatchException(Math::max(d1, d2), Math::min(d1, d2))
   }
   
   val static denseOrSparseException = new RuntimeException("Either a SparseMatrix or DenseMatrix required.")

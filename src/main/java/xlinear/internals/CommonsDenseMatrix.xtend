@@ -43,6 +43,7 @@ import xlinear.StaticUtils
   }
   
   override CommonsDenseMatrix multiplyTo(DenseMatrix another) {
+    StaticUtils::checkMatrixMultiplicationDimensionsMatch(this, another)
     // TODO: if big, attempt JBlas/JEigen?
     switch another {
       CommonsDenseMatrix : new CommonsDenseMatrix(this.implementation.multiply(another.implementation))

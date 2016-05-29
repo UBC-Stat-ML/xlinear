@@ -10,9 +10,7 @@ public class Doc
    * Summary [![Build Status](https://travis-ci.org/alexandrebouchard/xlinear.png?branch=master)](https://travis-ci.org/alexandrebouchard/xlinear)
    * -------
    * 
-   * xlinear is ...
-   * 
-   * xlinear stands for ...
+   * User friendly, dense+sparse linear algebra for Xtend and Java
    * 
    * 
    * Installation
@@ -57,6 +55,7 @@ public class Doc
   @Tutorial(startTutorial = "README.md", showSource = false)
   public void installInstructions()
   {
-    
   }
+  
+
 }

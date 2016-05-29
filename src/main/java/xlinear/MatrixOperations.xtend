@@ -3,7 +3,6 @@ package xlinear
 import xlinear.DenseMatrix
 import xlinear.SparseMatrix
 import xlinear.StaticUtils
-import javax.naming.OperationNotSupportedException
 
 class MatrixOperations {
   
@@ -126,7 +125,7 @@ class MatrixOperations {
 
   @Deprecated
   def static dispatch void *=(Matrix m1, Matrix m2) {
-    throw new OperationNotSupportedException(
+    throw new UnsupportedOperationException(
       "Matrix multiplication cannot be computed more efficiently in place. Use C = A * B; A = C;")
   }
   
