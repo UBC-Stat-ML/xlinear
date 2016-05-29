@@ -45,8 +45,8 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     return new CommonsDenseMatrix(new BlockRealMatrix(nRows, nCols))
   }
   
-  override DenseMatrix view(int row0Incl, int row1Excl, int col0Incl, int col1Incl) {
-    return new CommonsDenseMatrixView(this, row0Incl, row1Excl, col0Incl, col1Incl)
+  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl) {
+    return new CommonsDenseMatrixSlice(this, row0Incl, row1Excl, col0Incl, col1Incl)
   }
   
   override int nRows() {
@@ -72,7 +72,7 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     return StaticUtils::toStringDimensions(this) + " dense matrix\n" + StaticUtils::toString(this)
   }
   
-  private static class CommonsDenseMatrixView extends MatrixView implements DenseMatrix {
+  private static class CommonsDenseMatrixSlice extends Slice implements DenseMatrix {
     
     def private CommonsDenseMatrix root() {
       return rootMatrix as CommonsDenseMatrix
@@ -89,8 +89,8 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
         override void start(int rows, int columns, int startRow, int endRow, int startColumn, int endColumn) {}
         override void visit(int row, int col, double value) {
           visitor.visit(
-            translateRowRoot2View(row), 
-            translateColRoot2View(col), value
+            rowRoot2Slice(row), 
+            colRoot2Slice(col), value
           )
         }
       }, row0Incl, row1Excl - 1, // NB: Commons API uses inclusive end point for some reason
@@ -104,8 +104,8 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
         override void start(int rows, int columns, int startRow, int endRow, int startColumn, int endColumn) {}
         override double visit(int row, int col, double value) {
           return visitor.editInPlace(
-            translateRowRoot2View(row), 
-            translateColRoot2View(col), value
+            rowRoot2Slice(row), 
+            colRoot2Slice(col), value
           )
         }
       }, row0Incl, row1Excl - 1, // NB: Commons API uses inclusive end point for some reason
@@ -124,7 +124,7 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     
     override String toString() {
       // TODO: use views to truncate (ALSO IN VIEW AND SPARSE AND DENSE)
-      return StaticUtils::toStringDimensions(this) + " dense matrix view\n" + StaticUtils::toString(this)
+      return StaticUtils::toStringDimensions(this) + " dense matrix slice\n" + StaticUtils::toString(this)
     }
   }
 }
