@@ -15,7 +15,7 @@ class ViewsTests {
     
     println(matrix)
     
-    val Matrix view = matrix.slice(1, 2, 1, 3) 
+    val Matrix view = matrix.slice(1, 2, 1, 3, false) 
     
     println(view)
     

@@ -18,6 +18,8 @@ import xlinear.StaticUtils
   val protected int col0Incl
   val protected int col1Excl
   
+  val protected boolean readOnly
+  
   /**
    * Translate a row index relative to the slice to a row index
    * relative to the rootMatrix matrix
@@ -36,12 +38,15 @@ import xlinear.StaticUtils
   def protected int rowRoot2Slice(int rootRowIndex) { return rootRowIndex - row0Incl }
   def protected int colRoot2Slice(int rootColIndex) { return rootColIndex + col0Incl }
   
-  override Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl) {
+  override Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean subSliceReadOnly) {
+    if (readOnly && !subSliceReadOnly)
+      throw new UnsupportedOperationException
     StaticUtils::checkBounds(this, row0Incl,     col0Incl)  // TODO: encapsulate this and check everywhere 
     StaticUtils::checkBounds(this, row1Excl - 1, col1Excl - 1) // - 1 since the second pair is exclusive
     return rootMatrix.slice(
       rowSlice2Root(row0Incl), rowSlice2Root(row1Excl),
-      colSlice2Root(col0Incl), colSlice2Root(col1Excl)
+      colSlice2Root(col0Incl), colSlice2Root(col1Excl),
+      subSliceReadOnly
     )
   }
   
@@ -62,6 +67,8 @@ import xlinear.StaticUtils
   }
   
   override void set(int row, int col, double v) {
+    if (readOnly)
+      throw new UnsupportedOperationException
     StaticUtils::checkBounds(this, row, col)
     rootMatrix.set(
       rowSlice2Root(row),

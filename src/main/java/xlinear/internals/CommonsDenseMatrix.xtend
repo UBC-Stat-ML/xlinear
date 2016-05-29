@@ -45,8 +45,8 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     return new CommonsDenseMatrix(new BlockRealMatrix(nRows, nCols))
   }
   
-  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl) {
-    return new CommonsDenseMatrixSlice(this, row0Incl, row1Excl, col0Incl, col1Incl)
+  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean readOnly) {
+    return new CommonsDenseMatrixSlice(this, row0Incl, row1Excl, col0Incl, col1Incl, readOnly)
   }
   
   override int nRows() {
@@ -78,8 +78,8 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
       return rootMatrix as CommonsDenseMatrix
     }
     
-    new(CommonsDenseMatrix rootMatrix, int row0Incl, int row1Excl, int col0Incl, int col1Excl) {
-      super(rootMatrix, row0Incl, row1Excl, col0Incl, col1Excl)
+    new(CommonsDenseMatrix rootMatrix, int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean readOnly) {
+      super(rootMatrix, row0Incl, row1Excl, col0Incl, col1Excl, readOnly)
     }
     
     override visit(MatrixVisitorViewOnly visitor) {
@@ -98,6 +98,8 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     }
     
     override editInPlace(MatrixVisitorEditInPlace visitor) {
+      if (readOnly)
+        throw new UnsupportedOperationException
       // Warning: code similar to editInPlace
       root().implementation.walkInOptimizedOrder(new RealMatrixChangingVisitor() {
         override double end() { 0.0 }
@@ -124,7 +126,9 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     
     override String toString() {
       // TODO: use views to truncate (ALSO IN VIEW AND SPARSE AND DENSE)
-      return StaticUtils::toStringDimensions(this) + " dense matrix slice\n" + StaticUtils::toString(this)
+      return StaticUtils::toStringDimensions(this) + " dense matrix" + 
+        if (readOnly) " read-only" else "" + 
+        " slice\n" + StaticUtils::toString(this)
     }
   }
 }

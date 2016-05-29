@@ -26,7 +26,7 @@ import xlinear.StaticUtils
     return new ColtSparseMatrix(new SparseDoubleMatrix2D(nRows, nCols))
   }
   
-  override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl) {
+  override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean readOnly) {
     throw new UnsupportedOperationException("TODO: auto-generated method stub")
   }
   
