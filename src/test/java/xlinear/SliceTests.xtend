@@ -74,7 +74,7 @@ class SliceTests {
     val Matrix ro = matrix.slice(0, 1, 0, 1, true)
     
     ro.get(0, 0)
-//    assertTypeOfThrownExceptionMatches([ro.set(0, 0, 34)], new UnsupportedE
+    assertTypeOfThrownExceptionMatches([ro.set(0, 0, 34)], new UnsupportedOperationException)
     
   }
   

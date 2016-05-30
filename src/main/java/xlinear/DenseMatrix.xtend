@@ -2,7 +2,6 @@ package xlinear
 
 import xlinear.internals.MatrixVisitorViewOnly
 import xlinear.internals.MatrixVisitorEditInPlace
-import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D
 
 interface DenseMatrix extends Matrix {
     
