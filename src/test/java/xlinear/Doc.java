@@ -74,6 +74,8 @@ public class Doc
    * Quick start
    * -----------
    * 
+   * ### Importing
+   * 
    * To use xlinear in a Java file, add the following import statement:
    * 
    * ```java
@@ -86,9 +88,12 @@ public class Doc
    * import static extension xlinear.MatrixOperations.*
    * ```
    * 
+   * ### Basic usage
+   * 
    * Here are some examples of how to use xlinear, which illustrate important 
    * concepts and design decisions:
    */
+  @SuppressWarnings("unused")
   @Tutorial(showSource = true)
   @Test
   public void basics() 
@@ -132,16 +137,17 @@ public class Doc
   /**
    * Sparsity is correctly inferred using these rules:
    * 
-   * sparse + sparse = sparse (same for -)
-   * sparse + dense = dense (and vice versa, and same for -)
-   * dense + dense = dense (same for -)
-   * 
-   * sparse * sparse = sparse
-   * sparse * dense = sparse (and vice versa)
-   * sparse * sparse = sparse
-   * 
-   * dense * cnst = dense
-   * sparse * cnst = sparse
+   * - Additions (same for subtraction):
+   *     - ``sparse + sparse = sparse`` 
+   *     - ``sparse + dense = dense`` (and vice versa, ``dense + sparse = dense``)
+   *     - ``dense + dense = dense`` 
+   * - Multiplications: 
+   *     - ``sparse * sparse = sparse``
+   *     - ``sparse * dense = sparse`` (and vice versa)
+   *     - ``sparse * sparse = sparse``
+   * - Scalings:
+   *     - ``dense * cnst = dense`` (and vice versa)
+   *     - ``sparse * cnst = sparse`` (and vice versa)
    */
   @Tutorial(showSource = false)
   public void sparsity() {}
