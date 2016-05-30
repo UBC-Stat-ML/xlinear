@@ -67,8 +67,14 @@ class SliceTests {
     assertTypeOfThrownExceptionMatches([subView.slice(0, 1, 0, 0, true)], new IllegalArgumentException)
     
     // Check exception thrown on out of bounds
-    assertTypeOfThrownExceptionMatches([view.get(1,1)], StaticUtils::outOfRangeException(1,0,true))
-    assertTypeOfThrownExceptionMatches([view.get(0,2)], StaticUtils::outOfRangeException(2,1,false))
+    assertThrownExceptionMatches([view.get(1,1)], StaticUtils::outOfRangeException(1,0,true))
+    assertThrownExceptionMatches([view.get(0,2)], StaticUtils::outOfRangeException(2,1,false))
+    
+    // check read only slice is read only
+    val Matrix ro = matrix.slice(0, 1, 0, 1, true)
+    
+    ro.get(0, 0)
+//    assertTypeOfThrownExceptionMatches([ro.set(0, 0, 34)], new UnsupportedE
     
   }
   

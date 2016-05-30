@@ -148,8 +148,10 @@ class OperationsTest {
     val SparseMatrix matrix1 = randomSparse(rand, largeDim, 10)
     val SparseMatrix matrix2 = randomSparse(rand, largeDim, 10)
     
-    // test the test (ie. make sure the picked dim crashes if dense matrices are used)
-    assertTypeOfThrownExceptionMatches([testEfficient(denseCopy(matrix1), denseCopy(matrix2))], new OutOfMemoryError)
+    // This works, but somehow sometimes much more than the allocated heap is claimed 
+    // so this makes test unstable
+//    // test the test (ie. make sure the picked dim crashes if dense matrices are used)
+//    assertTypeOfThrownExceptionMatches([testEfficient(denseCopy(matrix1), denseCopy(matrix2))], new OutOfMemoryError)
     
     // check it's all good with sparse matrices 
     testEfficient(matrix1, matrix2)

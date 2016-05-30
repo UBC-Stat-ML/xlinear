@@ -1,6 +1,5 @@
 package xlinear
 
-import org.apache.commons.math3.exception.DimensionMismatchException
 
 /*
  * Design notes
