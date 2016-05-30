@@ -8,6 +8,7 @@ import static xlinear.TestData.*
 
 import org.junit.Test
 import org.apache.commons.math3.exception.DimensionMismatchException
+import java.util.Random
 
 /** 
  * Systematic check of all combinations of sparse/dense/scalar +, -, +=, -=, *, *=
@@ -117,11 +118,6 @@ class OperationsTest {
     
   }
   
-  def static Matrix multByMultInPlace(Matrix m1, Matrix m2) {
-    m1 *= m2
-    return m1
-  }
-  
   @Test
   def void testMatrixMultiply() {
     
@@ -142,6 +138,57 @@ class OperationsTest {
     assertTypeOfThrownExceptionMatches([sparseCopy(dataB) *= denseCopy(dataC)], new UnsupportedOperationException)
     assertTypeOfThrownExceptionMatches([denseCopy(dataB)  *= sparseCopy(dataC)], new UnsupportedOperationException)
     
+  }
+  
+  @Test
+  def void testEfficient() {
+    
+    val Random rand = new Random(1)
+    val int largeDim = 10_000
+    val SparseMatrix matrix1 = randomSparse(rand, largeDim, 10)
+    val SparseMatrix matrix2 = randomSparse(rand, largeDim, 10)
+    
+    // test the test (ie. make sure the picked dim crashes if dense matrices are used)
+    assertTypeOfThrownExceptionMatches([testEfficient(denseCopy(matrix1), denseCopy(matrix2))], new OutOfMemoryError)
+    
+    // check it's all good with sparse matrices 
+    testEfficient(matrix1, matrix2)
+    
+  }
+  
+  def static void testEfficient(Matrix matrix1, Matrix matrix2) {
+    matrix1 += matrix2
+    matrix1 *= 2
+    
+    matrix1 * matrix2
+    matrix1 + matrix2
+    matrix1 * 2
+    matrix1 - matrix2
+    matrix1 -= matrix2
+    
+    val Matrix dense1 = dense(matrix1.nRows, 3)
+    matrix1 * dense1
+    
+    val Matrix dense2 = dense(3, matrix1.nRows)
+    dense2 * matrix1
+  }
+  
+  def private static SparseMatrix randomSparse(Random rand, int graphSize, int numberSampled) {
+    
+    val SparseMatrix result = sparse(graphSize, graphSize)
+    
+    for (var int i = 0; i < numberSampled; i++) {
+      val int row = rand.nextInt(graphSize)
+      val int col = rand.nextInt(graphSize)
+      result.set(row, col, rand.nextDouble)
+    }
+    
+    return result
+  }
+    
+  def static Matrix multByMultInPlace(Matrix m1, Matrix m2) {
+    m1 *= m2
+    return m1
   }
   
   def static Matrix addByAddInPlace(Matrix m1, Matrix m2) {

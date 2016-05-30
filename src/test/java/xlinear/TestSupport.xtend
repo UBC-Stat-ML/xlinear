@@ -25,7 +25,7 @@ class TestSupport {
     try { code.run }
     catch (Throwable t) { thrown = t }
     val String expectedStr = "" + if (checkMessage) expectedException?.toString else expectedException?.class.simpleName
-    val String actualStr   = "" + if (checkMessage) thrown?.toString else thrown?.class.simpleName
+    val String actualStr   = "" + if (checkMessage) thrown?.toString else thrown?.class?.simpleName
     val boolean ok = expectedStr == actualStr
     Assert.assertTrue("Expected exception: " + expectedStr + "; got: " + actualStr , ok)
   }
