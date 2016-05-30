@@ -45,8 +45,9 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     return new CommonsDenseMatrix(new BlockRealMatrix(nRows, nCols))
   }
   
-  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean readOnly) {
-    return new CommonsDenseMatrixSlice(this, row0Incl, row1Excl, col0Incl, col1Incl, readOnly)
+  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean readOnly) {
+    StaticUtils::checkValidSlice(this, row0Incl, row1Excl, col0Incl, col1Excl)
+    return new CommonsDenseMatrixSlice(this, row0Incl, row1Excl, col0Incl, col1Excl, readOnly)
   }
   
   override int nRows() {

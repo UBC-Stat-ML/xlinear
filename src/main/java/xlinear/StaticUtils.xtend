@@ -78,13 +78,6 @@ class StaticUtils {
     return result
   }
   
-//  def static resetTo(SparseMatrix src, DenseMatrix dest) {
-//    // set dest to zero
-//    dest.editInPlace[int row, int col, double value | 0.0]
-//    // write to it the nonzeros or src
-//    src.visitNonZeros[int row, int col, double value | dest.set(row, col, value)]
-//  }
-  
   
   //// toString
   
@@ -172,18 +165,12 @@ class StaticUtils {
     m.set(row, col, increment + m.get(row, col))
   }
   
-  /**
-   * return matrix1 + matrix2 for dense matrices
-   */
   static def DenseMatrix add(DenseMatrix matrix1, DenseMatrix matrix2) {
     val DenseMatrix result = copy(matrix1)
     addInPlace(result, matrix2)
     return result
   }
   
-  /**
-   * destination += source for dense matrices
-   */
   static def void addInPlace(DenseMatrix destination, DenseMatrix source) {
     checkSizesEqual(destination, source)
     // assume efficient iteration order matches for the two
@@ -295,6 +282,13 @@ class StaticUtils {
   
   
   //// Utilities for exception handling
+  
+  def static void checkValidSlice(Matrix m, int row0Incl, int row1Excl, int col0Incl, int col1Excl) {
+    if (row1Excl <= row0Incl || col1Excl <= col0Incl)
+      throw new IllegalArgumentException("Slice dimensions should be positive.")
+    StaticUtils::checkBounds(m, row0Incl,     col0Incl)  // TODO: encapsulate this and check everywhere 
+    StaticUtils::checkBounds(m, row1Excl - 1, col1Excl - 1) // - 1 since the second pair is exclusive
+  }
   
   def static void checkBounds(Matrix m, int row, int col) {
     if (row < 0 || row >= m.nRows) throw outOfRangeException(row, m.nRows - 1, true)

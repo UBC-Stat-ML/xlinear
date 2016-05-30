@@ -41,9 +41,7 @@ import xlinear.StaticUtils
   override Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean subSliceReadOnly) {
     if (readOnly && !subSliceReadOnly)
       throw new UnsupportedOperationException
-    // These checks are technically not needed, but they make error messages more interpretable
-    StaticUtils::checkBounds(this, row0Incl,     col0Incl)  // TODO: encapsulate this and check everywhere 
-    StaticUtils::checkBounds(this, row1Excl - 1, col1Excl - 1) // - 1 since the second pair is exclusive
+    StaticUtils::checkValidSlice(this, row0Incl, row1Excl, col0Incl, col1Excl) 
     return rootMatrix.slice(
       rowSlice2Root(row0Incl), rowSlice2Root(row1Excl),
       colSlice2Root(col0Incl), colSlice2Root(col1Excl),
@@ -67,14 +65,14 @@ import xlinear.StaticUtils
     )
   }
   
-  override void set(int row, int col, double v) {
+  override void set(int row, int col, double value) {
     if (readOnly)
       throw new UnsupportedOperationException
     StaticUtils::checkBounds(this, row, col)
     rootMatrix.set(
       rowSlice2Root(row),
       colSlice2Root(col),
-      v
+      value
     )
   }
 }
