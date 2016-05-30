@@ -94,7 +94,7 @@ class StaticUtils {
       printer.set(0, 1 + 2*col, "" + col)
       printer.makeJustificationToLeft(1 + 2*col + 1)
     }
-    visitSkippingSomeZeros(matrix)[int row, int col, double value |
+    forceVisitAllEntries(matrix)[int row, int col, double value |
       val String str = String.format(Locale.US, "%G", value)
       val int dotLocation = str.indexOf('.')
       val prefix = if (dotLocation == -1) str else str.subSequence(0, dotLocation)
@@ -120,6 +120,23 @@ class StaticUtils {
       SparseMatrix : matrix.visitNonZeros(visitor)
       DenseMatrix  : matrix.visit(visitor)
       default      : throw denseOrSparseException
+    }
+  }
+  
+  /**
+   * Note: this is inefficient for sparse matrices. Used in cases where this would not 
+   * be a bottleneck e.g. in toString
+   */
+  static def void forceVisitAllEntries(Matrix matrix, MatrixVisitorViewOnly visitor) {
+    switch matrix {
+      DenseMatrix  : matrix.visit(visitor)
+      SparseMatrix : {
+        for (var int r = 0; r < matrix.nRows; r++)
+          for (var int c = 0; c < matrix.nCols; c++)
+            visitor.visit(r, c, matrix.get(r, c))
+      }
+      default:
+        throw denseOrSparseException
     }
   }
   

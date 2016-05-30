@@ -59,6 +59,8 @@ interface Matrix {
   def double get(int row, int col)
   def void set(int row, int col, double v)
   
+  def Matrix createEmpty(int nRows, int nCols)
+  
   // TODO: offer implementations of equals, hashcode (use visitSkipSomeZeros? which you may want to add here in interface, or not needed actually)
   // TODO: same for toString, with options to limit # of entries
   

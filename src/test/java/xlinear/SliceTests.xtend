@@ -11,6 +11,7 @@ class SliceTests {
   @Test
   def void testSlices() {
     testSlice(denseCopy(dataA))
+    testSlice(sparseCopy(dataA))
   }
   
   def void testSlice(Matrix matrix) {
@@ -22,6 +23,13 @@ class SliceTests {
     Assert.assertEquals(StaticUtils::toString(matrix), expected)
     
     val Matrix view = matrix.slice(1, 2, 1, 3, false) 
+    
+    
+    // TODO: need to check for slice x concrete implementation as well
+    // TODO: (global) start documentation
+    // TODO: create wrappers based on https://github.com/scalanlp/breeze/wiki/Linear-Algebra-Cheat-Sheet
+    // TODO: det, eig, chol, inv, etc
+    // TODO: hook up jeigen
     
     expected = '''
           0                1

@@ -15,128 +15,159 @@ import java.util.Random
  */
 class OperationsTest {
   
+  static private interface MatrixProvider {
+    def Matrix provide(double [][] data)
+  }
+  
   @Test
   def void testPlusMinusScale() {
+    testPlusMinusScale(
+      [double [][] data | sparseCopy(data)],
+      [double [][] data | denseCopy(data)])
+    // test views too
+    testPlusMinusScale(
+      [double [][] data | growAndView(sparseCopy(data))],
+      [double [][] data | growAndView(denseCopy(data))])
+  }
+  
+  def private Matrix growAndView(Matrix m) {
+    val Matrix augmented = m.createEmpty(m.nRows + 2, m.nCols + 2)
+    for (var int r = 0; r < m.nRows; r++)
+      for (var int c = 0; c < m.nCols; c++)
+        augmented.set(r + 1, c + 1, m.get(r, c))
+    val Matrix result = augmented.slice(1, augmented.nRows - 1, 1, augmented.nCols - 1, false)
+    if (result.nRows != m.nRows || result.nCols != m.nCols)
+      throw new RuntimeException
+    return result
+  }
+    
+  def void testPlusMinusScale(MatrixProvider sparses, MatrixProvider denses) {
     
     //// +
     
-    assertMatch(denseCopy(dataA)  + denseCopy(dataB), sum)
-    assertMatch(sparseCopy(dataA) + sparseCopy(dataB), sum)
-    assertMatch(sparseCopy(dataA) + denseCopy(dataB), sum)
-    assertMatch(denseCopy(dataA)  + sparseCopy(dataB), sum)
+    assertMatch(denses.provide(dataA)  + denses.provide(dataB), sum)
+    assertMatch(sparses.provide(dataA) + sparses.provide(dataB), sum)
+    assertMatch(sparses.provide(dataA) + denses.provide(dataB), sum)
+    assertMatch(denses.provide(dataA)  + sparses.provide(dataB), sum)
     
     
     // check mismatches throw exceptions
     
-    assertThrownExceptionMatches([denseCopy(dataA)   + denseCopy(dataC)], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([sparseCopy(dataA)  + sparseCopy(dataC)], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([sparseCopy(dataA)  + denseCopy(dataC)], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([denseCopy(dataA)   + sparseCopy(dataC)], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([denses.provide(dataA)   + denses.provide(dataC)], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([sparses.provide(dataA)  + sparses.provide(dataC)], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([sparses.provide(dataA)  + denses.provide(dataC)], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([denses.provide(dataA)   + sparses.provide(dataC)], new DimensionMismatchException(3,2))
     
     
     //// +=
     
-    assertMatch(addByAddInPlace(denseCopy(dataA),  denseCopy(dataB)), sum)
-    assertMatch(addByAddInPlace(sparseCopy(dataA), sparseCopy(dataB)), sum)
-    assertMatch(addByAddInPlace(sparseCopy(dataA), denseCopy(dataB)), sum)
-    assertMatch(addByAddInPlace(denseCopy(dataA),  sparseCopy(dataB)), sum)
+    assertMatch(addByAddInPlace(denses.provide(dataA),  denses.provide(dataB)), sum)
+    assertMatch(addByAddInPlace(sparses.provide(dataA), sparses.provide(dataB)), sum)
+    assertMatch(addByAddInPlace(sparses.provide(dataA), denses.provide(dataB)), sum)
+    assertMatch(addByAddInPlace(denses.provide(dataA),  sparses.provide(dataB)), sum)
     
     
     // check mismatches throw exceptions
     
-    assertThrownExceptionMatches([addByAddInPlace(denseCopy(dataA),  denseCopy(dataC))], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([addByAddInPlace(sparseCopy(dataA), sparseCopy(dataC))], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([addByAddInPlace(sparseCopy(dataA), denseCopy(dataC))], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([addByAddInPlace(denseCopy(dataA),  sparseCopy(dataC))], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([addByAddInPlace(denses.provide(dataA),  denses.provide(dataC))], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([addByAddInPlace(sparses.provide(dataA), sparses.provide(dataC))], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([addByAddInPlace(sparses.provide(dataA), denses.provide(dataC))], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([addByAddInPlace(denses.provide(dataA),  sparses.provide(dataC))], new DimensionMismatchException(3,2))
     
     
     // make sure behavior is ok when both arg are identical
     
-    assertMatch(denseCopy(dataA)  + denseCopy(dataA), a2)
-    assertMatch(sparseCopy(dataA) + sparseCopy(dataA), a2)
-    assertMatch(sparseCopy(dataA) + denseCopy(dataA), a2)
-    assertMatch(denseCopy(dataA)  + sparseCopy(dataA), a2)
+    assertMatch(denses.provide(dataA)  + denses.provide(dataA), a2)
+    assertMatch(sparses.provide(dataA) + sparses.provide(dataA), a2)
+    assertMatch(sparses.provide(dataA) + denses.provide(dataA), a2)
+    assertMatch(denses.provide(dataA)  + sparses.provide(dataA), a2)
     
-    val DenseMatrix dense = denseCopy(dataA)
-    val SparseMatrix sparse = sparseCopy(dataA)
+    val Matrix dense = denses.provide(dataA)
+    val Matrix sparse = sparses.provide(dataA)
     assertMatch(addByAddInPlace(dense,  dense), a2)
     assertMatch(addByAddInPlace(sparse, sparse), a2)
     
     
     //// -
     
-    assertMatch(denseCopy(dataA)  - denseCopy(dataB), diff)
-    assertMatch(sparseCopy(dataA) - sparseCopy(dataB), diff)
-    assertMatch(sparseCopy(dataA) - denseCopy(dataB), diff)
-    assertMatch(denseCopy(dataA)  - sparseCopy(dataB), diff)
+    assertMatch(denses.provide(dataA)  - denses.provide(dataB), diff)
+    assertMatch(sparses.provide(dataA) - sparses.provide(dataB), diff)
+    assertMatch(sparses.provide(dataA) - denses.provide(dataB), diff)
+    assertMatch(denses.provide(dataA)  - sparses.provide(dataB), diff)
     
     
     // check mismatches throw exceptions
     
-    assertThrownExceptionMatches([denseCopy(dataA)  - denseCopy(dataC)], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([sparseCopy(dataA) - sparseCopy(dataC)], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([sparseCopy(dataA) - denseCopy(dataC)], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([denseCopy(dataA)  - sparseCopy(dataC)], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([denses.provide(dataA)  - denses.provide(dataC)], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([sparses.provide(dataA) - sparses.provide(dataC)], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([sparses.provide(dataA) - denses.provide(dataC)], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([denses.provide(dataA)  - sparses.provide(dataC)], new DimensionMismatchException(3,2))
     
     
     //// -=
     
-    assertMatch(subByAddInPlace(denseCopy(dataA),  denseCopy(dataB)), diff)
-    assertMatch(subByAddInPlace(sparseCopy(dataA), sparseCopy(dataB)), diff)
-    assertMatch(subByAddInPlace(sparseCopy(dataA), denseCopy(dataB)), diff)
-    assertMatch(subByAddInPlace(denseCopy(dataA),  sparseCopy(dataB)), diff)
+    assertMatch(subByAddInPlace(denses.provide(dataA),  denses.provide(dataB)), diff)
+    assertMatch(subByAddInPlace(sparses.provide(dataA), sparses.provide(dataB)), diff)
+    assertMatch(subByAddInPlace(sparses.provide(dataA), denses.provide(dataB)), diff)
+    assertMatch(subByAddInPlace(denses.provide(dataA),  sparses.provide(dataB)), diff)
     
     
     // check mismatches throw exceptions
     
-    assertThrownExceptionMatches([subByAddInPlace(denseCopy(dataA),  denseCopy(dataC))], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([subByAddInPlace(sparseCopy(dataA), sparseCopy(dataC))], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([subByAddInPlace(sparseCopy(dataA), denseCopy(dataC))], new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([subByAddInPlace(denseCopy(dataA),  sparseCopy(dataC))], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([subByAddInPlace(denses.provide(dataA),  denses.provide(dataC))], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([subByAddInPlace(sparses.provide(dataA), sparses.provide(dataC))], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([subByAddInPlace(sparses.provide(dataA), denses.provide(dataC))], new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([subByAddInPlace(denses.provide(dataA),  sparses.provide(dataC))], new DimensionMismatchException(3,2))
     
     
     //// * scalar
     
-    assertMatch(denseCopy(dataA)  * 2, a2)
-    assertMatch(sparseCopy(dataA) * 2, a2)
-    assertMatch(2 * denseCopy(dataA), a2)
-    assertMatch(2 * sparseCopy(dataA), a2)
+    assertMatch(denses.provide(dataA)  * 2, a2)
+    assertMatch(sparses.provide(dataA) * 2, a2)
+    assertMatch(2 * denses.provide(dataA), a2)
+    assertMatch(2 * sparses.provide(dataA), a2)
     
     
     // special case
     
-    assertMatch(denseCopy(dataA)  * 1.0, dataA)
-    assertMatch(sparseCopy(dataA) * 1.0, dataA)
-    assertMatch(1.0 * denseCopy(dataA), dataA)
-    assertMatch(1.0 * sparseCopy(dataA), dataA)
+    assertMatch(denses.provide(dataA)  * 1.0, dataA)
+    assertMatch(sparses.provide(dataA) * 1.0, dataA)
+    assertMatch(1.0 * denses.provide(dataA), dataA)
+    assertMatch(1.0 * sparses.provide(dataA), dataA)
     
     
     //// *= scalar
     
-    assertMatch(scaleByScaleInPlace(denseCopy(dataA), 2), a2)
-    assertMatch(scaleByScaleInPlace(sparseCopy(dataA), 2), a2)
+    assertMatch(scaleByScaleInPlace(denses.provide(dataA), 2), a2)
+    assertMatch(scaleByScaleInPlace(sparses.provide(dataA), 2), a2)
     
   }
   
   @Test
   def void testMatrixMultiply() {
+    testMatrixMultiply(
+      [double [][] data | sparseCopy(data)],
+      [double [][] data | denseCopy(data)])
+  }
+  
+  def void testMatrixMultiply(MatrixProvider sparses, MatrixProvider denses) {
     
-    assertMatch(denseCopy(dataC)  * denseCopy(dataD), prod)
-    assertMatch(sparseCopy(dataC) * sparseCopy(dataD), prod)
-    assertMatch(sparseCopy(dataC) * denseCopy(dataD), prod)
-    assertMatch(denseCopy(dataC)  * sparseCopy(dataD), prod)
+    assertMatch(denses.provide(dataC)  * denses.provide(dataD), prod)
+    assertMatch(sparses.provide(dataC) * sparses.provide(dataD), prod)
+    assertMatch(sparses.provide(dataC) * denses.provide(dataD), prod)
+    assertMatch(denses.provide(dataC)  * sparses.provide(dataD), prod)
     
     // check exceptions for dim mismatch
-    assertThrownExceptionMatches([denseCopy(dataB)  * denseCopy(dataC)],new DimensionMismatchException(3,2)) 
-    assertThrownExceptionMatches([sparseCopy(dataB) * sparseCopy(dataC)],new DimensionMismatchException(3,2))
-    assertThrownExceptionMatches([sparseCopy(dataB) * denseCopy(dataC)],new DimensionMismatchException(3,2)) 
-    assertThrownExceptionMatches([denseCopy(dataB)  * sparseCopy(dataC)],new DimensionMismatchException(3,2)) 
+    assertThrownExceptionMatches([denses.provide(dataB)  * denses.provide(dataC)],new DimensionMismatchException(3,2)) 
+    assertThrownExceptionMatches([sparses.provide(dataB) * sparses.provide(dataC)],new DimensionMismatchException(3,2))
+    assertThrownExceptionMatches([sparses.provide(dataB) * denses.provide(dataC)],new DimensionMismatchException(3,2)) 
+    assertThrownExceptionMatches([denses.provide(dataB)  * sparses.provide(dataC)],new DimensionMismatchException(3,2)) 
     
     // check unsupported *= operations
-    assertTypeOfThrownExceptionMatches([denseCopy(dataB)  *= denseCopy(dataC)], new UnsupportedOperationException)
-    assertTypeOfThrownExceptionMatches([sparseCopy(dataB) *= sparseCopy(dataC)], new UnsupportedOperationException)
-    assertTypeOfThrownExceptionMatches([sparseCopy(dataB) *= denseCopy(dataC)], new UnsupportedOperationException)
-    assertTypeOfThrownExceptionMatches([denseCopy(dataB)  *= sparseCopy(dataC)], new UnsupportedOperationException)
+    assertTypeOfThrownExceptionMatches([denses.provide(dataB)  *= denses.provide(dataC)], new UnsupportedOperationException)
+    assertTypeOfThrownExceptionMatches([sparses.provide(dataB) *= sparses.provide(dataC)], new UnsupportedOperationException)
+    assertTypeOfThrownExceptionMatches([sparses.provide(dataB) *= denses.provide(dataC)], new UnsupportedOperationException)
+    assertTypeOfThrownExceptionMatches([denses.provide(dataB)  *= sparses.provide(dataC)], new UnsupportedOperationException)
     
   }
   

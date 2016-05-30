@@ -25,16 +25,16 @@ class BasicTests {
     matrix = sparseCopy(dataA)
     expectedString = '''
     2 x 3 sparse matrix
-           0              1               2
-    0 |    1.50000      -45.0000        NAN
-    1 |   -5.00000E-15            -INFINITY'''
+           0              1                2
+    0 |    1.50000      -45.0000         NAN
+    1 |   -5.00000E-15    0.00000  -INFINITY'''
     Assert.assertEquals(expectedString, matrix.toString)
     
-    matrix = denseCopy(#[#[5.6]])
+    matrix = denseCopy(#[#[0.0]])
     expectedString = '''
     1 x 1 dense matrix
           0      
-    0 |   5.60000'''
+    0 |   0.00000'''
     Assert.assertEquals(expectedString, matrix.toString)
 
   }

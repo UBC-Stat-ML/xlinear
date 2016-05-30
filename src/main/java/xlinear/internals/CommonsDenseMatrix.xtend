@@ -36,9 +36,19 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     StaticUtils::checkMatrixMultiplicationDimensionsMatch(this, another)
     // TODO: if big, attempt JBlas/JEigen?
     switch another {
-      CommonsDenseMatrix : new CommonsDenseMatrix(this.implementation.multiply(another.implementation))
-      default : throw new UnsupportedOperationException("TODO: if small, use default impl; later, if big create a copy in efficient storage?")
+      CommonsDenseMatrix : 
+        return new CommonsDenseMatrix(this.implementation.multiply(another.implementation))
+      default : 
+        return multiplyTo(convert(another)) // TODO: if small, use default implementation instead?
     }
+  }
+  
+  def static private DenseMatrix convert(DenseMatrix model) {
+    val CommonsDenseMatrix result = new CommonsDenseMatrix(new BlockRealMatrix(model.nRows, model.nCols))
+    result.editInPlace[int row, int col, double currentValue |
+      model.get(row, col)
+    ]
+    return result
   }
   
   override CommonsDenseMatrix createEmpty(int nRows, int nCols) {
