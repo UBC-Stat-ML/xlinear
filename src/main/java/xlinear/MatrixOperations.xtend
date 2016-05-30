@@ -259,5 +259,30 @@ class MatrixOperations {
     StaticUtils::subtractInPlace(matrix1, matrix2)
   }
   
+  
+  //// shortcuts for Java users
+  
+  /**
+   * Multiply either two matrices or a matrix and a scalar.
+   * 
+   * This will result in a sparse matrix if at least one (or both) of the two input 
+   * matrices is sparse, otherwise this will result in a dense matrix if all 
+   * matrices involved are dense.
+   */
+  def static Matrix mult(Object matrixOrScalar1, Object matrixOrScalar2) {
+    operator_multiply(matrixOrScalar1, matrixOrScalar2)
+  }
+  
+  /**
+   * Add two matrices.
+   * 
+   * This will result in a dense matrix if at least one (or both) of the input 
+   * matrices is dense, otherwise this will result in a sparse matrix if the two 
+   * matrices are sparse.
+   */
+  def static Matrix plus(Matrix matrix1, Matrix matrix2) {
+    operator_plus(matrix1, matrix2)
+  }
+  
   private new() {}
 }

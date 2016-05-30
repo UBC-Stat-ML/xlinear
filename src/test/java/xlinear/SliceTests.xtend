@@ -25,7 +25,6 @@ class SliceTests {
     val Matrix view = matrix.slice(1, 2, 1, 3, false) 
     
     
-    // TODO: need to check for slice x concrete implementation as well
     // TODO: (global) start documentation
     // TODO: create wrappers based on https://github.com/scalanlp/breeze/wiki/Linear-Algebra-Cheat-Sheet
     // TODO: det, eig, chol, inv, etc
