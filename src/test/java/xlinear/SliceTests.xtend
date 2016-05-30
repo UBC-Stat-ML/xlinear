@@ -30,6 +30,7 @@ class SliceTests {
     // TODO: create wrappers based on https://github.com/scalanlp/breeze/wiki/Linear-Algebra-Cheat-Sheet
     // TODO: det, eig, chol, inv, etc
     // TODO: hook up jeigen
+    // TODO: document, but do not do complex matrix stuff
     
     expected = '''
           0                1
