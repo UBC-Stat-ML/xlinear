@@ -20,4 +20,6 @@ interface DenseMatrix extends Matrix {
   def DenseMatrix createEmpty(int nRows, int nCols)
   
   def DenseMatrix multiplyTo(DenseMatrix another) 
+  
+  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean readOnly)
 }

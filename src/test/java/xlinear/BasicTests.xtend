@@ -28,7 +28,15 @@ class BasicTests {
            0              1               2
     0 |    1.50000      -45.0000        NAN
     1 |   -5.00000E-15            -INFINITY'''
-      Assert.assertEquals(expectedString, matrix.toString)
+    Assert.assertEquals(expectedString, matrix.toString)
+    
+    matrix = denseCopy(#[#[5.6]])
+    expectedString = '''
+    1 x 1 dense matrix
+          0      
+    0 |   5.60000'''
+    Assert.assertEquals(expectedString, matrix.toString)
+
   }
   
   @Test

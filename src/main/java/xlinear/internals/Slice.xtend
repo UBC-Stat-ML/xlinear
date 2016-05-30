@@ -36,7 +36,7 @@ import xlinear.StaticUtils
    * Note: assumes bounds have already been checked.
    */
   def protected int rowRoot2Slice(int rootRowIndex) { return rootRowIndex - row0Incl }
-  def protected int colRoot2Slice(int rootColIndex) { return rootColIndex + col0Incl }
+  def protected int colRoot2Slice(int rootColIndex) { return rootColIndex - col0Incl }
   
   override Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean subSliceReadOnly) {
     if (readOnly && !subSliceReadOnly)

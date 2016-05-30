@@ -82,22 +82,27 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
       super(rootMatrix, row0Incl, row1Excl, col0Incl, col1Excl, readOnly)
     }
     
-    override visit(MatrixVisitorViewOnly visitor) {
+    override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean subSliceReadOnly) {
+      super.slice(row0Incl, row1Excl, col0Incl, col1Incl, subSliceReadOnly) as DenseMatrix
+    }
+    
+    override void visit(MatrixVisitorViewOnly visitor) {
       // Warning: code similar to editInPlace
       root().implementation.walkInOptimizedOrder(new RealMatrixPreservingVisitor() {
         override double end() { 0.0 }
         override void start(int rows, int columns, int startRow, int endRow, int startColumn, int endColumn) {}
         override void visit(int row, int col, double value) {
           visitor.visit(
-            rowRoot2Slice(row), 
-            colRoot2Slice(col), value
+            rowRoot2Slice(row),
+            colRoot2Slice(col), 
+            value
           )
         }
       }, row0Incl, row1Excl - 1, // NB: Commons API uses inclusive end point for some reason
          col0Incl, col1Excl - 1);
     }
     
-    override editInPlace(MatrixVisitorEditInPlace visitor) {
+    override void editInPlace(MatrixVisitorEditInPlace visitor) {
       if (readOnly)
         throw new UnsupportedOperationException
       // Warning: code similar to editInPlace
@@ -107,14 +112,15 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
         override double visit(int row, int col, double value) {
           return visitor.editInPlace(
             rowRoot2Slice(row), 
-            colRoot2Slice(col), value
+            colRoot2Slice(col), 
+            value
           )
         }
       }, row0Incl, row1Excl - 1, // NB: Commons API uses inclusive end point for some reason
          col0Incl, col1Excl - 1);
     }
     
-    override createEmpty(int nRows, int nCols) {
+    override DenseMatrix createEmpty(int nRows, int nCols) {
       return root().createEmpty(nRows, nCols)
     }
     

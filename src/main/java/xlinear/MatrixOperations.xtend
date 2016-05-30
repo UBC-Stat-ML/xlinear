@@ -35,9 +35,15 @@ class MatrixOperations {
     StaticUtils::copy(model)
   }
   
-  def dispatch static DenseMatrix copy(double[][] data) {
-    StaticUtils::createDenseMatrixByCopyingArrayContents(data)
-  }
+  /*
+   * Design note: we avoid copy(double [][] data) in a dispatch method 
+   * because it then doesn't work with copy(#[#[1.2, 4.5]]) idiom (Xtend 
+   * only translates #[..] to double [] if it can infer from static 
+   * analysis)
+   */
+//  def dispatch static DenseMatrix copy(double[][] data) {
+//    StaticUtils::createDenseMatrixByCopyingArrayContents(data)
+//  }
   
   def static DenseMatrix denseCopy(double[][] data) {
     StaticUtils::createDenseMatrixByCopyingArrayContents(data)
