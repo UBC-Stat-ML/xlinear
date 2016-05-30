@@ -38,9 +38,10 @@ import xlinear.StaticUtils
   def protected int rowRoot2Slice(int rootRowIndex) { return rootRowIndex - row0Incl }
   def protected int colRoot2Slice(int rootColIndex) { return rootColIndex - col0Incl }
   
-  override Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean subSliceReadOnly) {
+  override Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean subSliceReadOnly) {
     if (readOnly && !subSliceReadOnly)
       throw new UnsupportedOperationException
+    // These checks are technically not needed, but they make error messages more interpretable
     StaticUtils::checkBounds(this, row0Incl,     col0Incl)  // TODO: encapsulate this and check everywhere 
     StaticUtils::checkBounds(this, row1Excl - 1, col1Excl - 1) // - 1 since the second pair is exclusive
     return rootMatrix.slice(

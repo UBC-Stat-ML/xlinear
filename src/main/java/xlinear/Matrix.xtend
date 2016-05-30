@@ -52,7 +52,7 @@ import org.apache.commons.math3.exception.DimensionMismatchException
  */
 interface Matrix { 
   
-  def Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean readOnly) 
+  def Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean readOnly) 
   
   def int nRows()
   def int nCols()

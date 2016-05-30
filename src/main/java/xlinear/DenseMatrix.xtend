@@ -21,5 +21,5 @@ interface DenseMatrix extends Matrix {
   
   def DenseMatrix multiplyTo(DenseMatrix another) 
   
-  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean readOnly)
+  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean readOnly)
 }

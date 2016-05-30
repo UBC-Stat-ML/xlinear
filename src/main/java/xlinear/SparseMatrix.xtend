@@ -31,6 +31,6 @@ interface SparseMatrix extends Matrix {
   
   def SparseMatrix multiplyTo(SparseMatrix another)
   
-  override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Incl, boolean readOnly)
+  override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean readOnly)
   
 }

@@ -25,6 +25,25 @@ class MatrixOperations {
   }
   
   
+  //// Empty vector creation (n x 1)
+  
+  def static Matrix zeros(int nRows, boolean sparse) {
+    if (sparse) sparse(nRows) else dense(nRows)
+  }
+  
+  def static DenseMatrix zeros(int nRows) {
+    dense(nRows)
+  }
+  
+  def static DenseMatrix dense(int nRows) {
+    StaticUtils::createEmptyDenseMatrix(nRows, 1)
+  }
+  
+  def static SparseMatrix sparse(int nRows) {
+    StaticUtils::createEmptySparseMatrix(nRows, 1)
+  }
+  
+  
   //// Creating matrices by copying
   
   def dispatch static SparseMatrix copy(SparseMatrix model) {
