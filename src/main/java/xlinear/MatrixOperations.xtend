@@ -263,25 +263,79 @@ class MatrixOperations {
   //// shortcuts for Java users
   
   /**
-   * Multiply either two matrices or a matrix and a scalar.
+   * Multiply either two matrices or a matrix and a scalar, equivalent to Xtend's
+   * 
+   * matrixOrScalar1 * matrixOrScalar2
    * 
    * This will result in a sparse matrix if at least one (or both) of the two input 
    * matrices is sparse, otherwise this will result in a dense matrix if all 
    * matrices involved are dense.
    */
   def static Matrix mult(Object matrixOrScalar1, Object matrixOrScalar2) {
-    operator_multiply(matrixOrScalar1, matrixOrScalar2)
+    return operator_multiply(matrixOrScalar1, matrixOrScalar2)
   }
   
   /**
-   * Add two matrices.
+   * Multiply the matrix in place by a scalar, equivalent to Xtend's
+   * 
+   * matrix *= scalar
+   * 
+   * Sparsity will be preserved.
+   * 
+   * Note that matrix multiplication in place is not implemented since efficient 
+   * matrix routines typically need to write in a fresh matrix.
+   * 
+   */
+  def static void multEquals(Matrix matrix, Number scalar) {
+    operator_multiplyAssign(matrix, scalar)
+  }
+  
+  /**
+   * Add two matrices, equivalent to Xtend's
+   * 
+   * matrix1 + matrix2
    * 
    * This will result in a dense matrix if at least one (or both) of the input 
    * matrices is dense, otherwise this will result in a sparse matrix if the two 
    * matrices are sparse.
    */
-  def static Matrix plus(Matrix matrix1, Matrix matrix2) {
-    operator_plus(matrix1, matrix2)
+  def static Matrix add(Matrix matrix1, Matrix matrix2) {
+    return operator_plus(matrix1, matrix2)
+  }
+  
+  /**
+   * Add in place matrix2 into matrix1, equivalent to Xtend's
+   * 
+   * matrix1 += matrix2
+   * 
+   * The type (dense/sparse) of matrix1 is forced to stay the same.
+   */
+  def static void addEquals(Matrix matrix1, Matrix matrix2 ) {
+    operator_add(matrix1, matrix2)
+  }
+  
+  /**
+   * Subtract two matrices, equivalent to Xtend's
+   * 
+   * matrix1 - matrix2
+   * 
+   * This will result in a dense matrix if at least one (or both) of the input 
+   * matrices is dense, otherwise this will result in a sparse matrix if the two 
+   * matrices are sparse.
+   */
+  def static Matrix sub(Matrix matrix1, Matrix matrix2) {
+    return operator_minus(matrix1, matrix2)
+  }
+  
+  /**
+   * Subtract in place matrix2 from matrix1, equivalent to Xtend's
+   * 
+   * matrix1 -= matrix2
+   * 
+   * The type (dense/sparse) of matrix1 is forced to stay the same.
+   */
+  def static void subEquals(Matrix matrix1, Matrix matrix2) {
+    operator_remove(matrix1, matrix2)
   }
   
   private new() {}

@@ -12,7 +12,7 @@ public class Doc
 {
   /**
    * 
-   * Summary [![Build Status](https://travis-ci.org/alexandrebouchard/xlinear.png?branch=master)](https://travis-ci.org/alexandrebouchard/xlinear)
+   * Summary 
    * -------
    * 
    * There are several excellent linear algebra libraries for Java, but they generally have a 
@@ -96,35 +96,53 @@ public class Doc
     // The recommended API is all in MatrixOperations
     // This API uses dispatch methods, so you are not required
     // to keep track of the detailed type of matrices (e.g. sparse vs dense)
-	  Matrix m1 = dense(3,100_000);
-	  Matrix m2 = sparse(100_000,3);
+    Matrix m1 = dense(3,100_000);
+    Matrix m2 = sparse(100_000,3);
 	  
-	  // We generally follow Java conventions, e.g. matrices are 0-indexed
-	  m1.set(0, 0, 1);
-	  m2.set(0, 0, 1);
+    // We generally follow Java conventions, e.g. matrices are 0-indexed
+    m1.set(0, 0, 1);
+    m2.set(0, 0, 1);
+    
+    // Basic operations use a straightforward syntax: 
+    
+    // mult(mtxOrScalar1,mtxOrScalar2), add(mtx1,mtx2), sub(mtx1,mtx2), which do not modify the inputs
+    // multEquals(mtx1, scalar), addEquals(mtx1, mtx2), subEquals(mtx1, mtx2), which modify mtx1
+    
+    // Examples:
+    
+    Matrix prod = mult(m1, m2);    // in Xtend: "var prod   = m1 * m2"
+    Matrix scaled = mult(4, m1);   // in Xtend: "var scaled = 4 * m1"
+    multEquals(scaled, 5.0);       // in Xtend: "scaled *= 5.0"
+    
+    addEquals(prod, prod);         // in Xtend: "var prod += prod"
+    Matrix sum = add(prod, prod);  // in Xtend: "var sum = prod + prod"
+    
+    subEquals(sum, sum);           // in Xtend: "var prod -= prod"
+    Matrix diff = sub(prod, prod); // in Xtend: "var sum = prod - prod"
+    
+    System.out.println(prod);  
 	  
-	  Matrix prod = mult(m1, m2); // in Xtend: "val prod = m1 * m2"
-	  System.out.println(prod);  
-	  
-	  // 3 x 3 sparse matrix
+    // 3 x 3 sparse matrix
     //       0        1        2      
-    // 0 |   1.00000  0.00000  0.00000
+    // 0 |   2.00000  0.00000  0.00000
     // 1 |   0.00000  0.00000  0.00000
     // 2 |   0.00000  0.00000  0.00000
-	  
-	  // Note that sparsity is automatically inferred using these rules:
-	  
-	  // sparse + sparse = sparse (same for -)
-	  // sparse + dense = dense (and vice versa, and same for -)
-	  // dense + dense = dense (same for -)
-	  
-	  // sparse * sparse = sparse
-	  // sparse * dense = sparse (and vice versa)
-	  // sparse * sparse = sparse
-	  
-	  // dense * cnst = dense
-	  // sparse * cnst = sparse
-	  
-	  Matrix another = mult(prod, 4);
   }
+  
+  /**
+   * Sparsity is correctly inferred using these rules:
+   * 
+   * sparse + sparse = sparse (same for -)
+   * sparse + dense = dense (and vice versa, and same for -)
+   * dense + dense = dense (same for -)
+   * 
+   * sparse * sparse = sparse
+   * sparse * dense = sparse (and vice versa)
+   * sparse * sparse = sparse
+   * 
+   * dense * cnst = dense
+   * sparse * cnst = sparse
+   */
+  @Tutorial(showSource = false)
+  public void sparsity() {}
 }
