@@ -38,14 +38,12 @@ import xlinear.StaticUtils
   def protected int rowRoot2Slice(int rootRowIndex) { return rootRowIndex - row0Incl }
   def protected int colRoot2Slice(int rootColIndex) { return rootColIndex - col0Incl }
   
-  override Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean subSliceReadOnly) {
-    if (readOnly && !subSliceReadOnly)
-      throw new UnsupportedOperationException
+  override Matrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean makeSubSliceReadOnly) {
     StaticUtils::checkValidSlice(this, row0Incl, row1Excl, col0Incl, col1Excl) 
     return rootMatrix.slice(
       rowSlice2Root(row0Incl), rowSlice2Root(row1Excl),
       colSlice2Root(col0Incl), colSlice2Root(col1Excl),
-      subSliceReadOnly
+      makeSubSliceReadOnly || readOnly
     )
   }
   

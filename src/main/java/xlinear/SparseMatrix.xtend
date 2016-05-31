@@ -2,6 +2,7 @@ package xlinear
 
 import xlinear.internals.MatrixVisitorViewOnly
 import xlinear.internals.MatrixVisitorEditInPlace
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock
 
 interface SparseMatrix extends Matrix {
     
@@ -31,6 +32,17 @@ interface SparseMatrix extends Matrix {
   
   def SparseMatrix multiplyTo(SparseMatrix another)
   
-  override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean readOnly)
-  
+  override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean makeReadOnly)
+  override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl) {
+    return Matrix.super.slice(row0Incl, row1Excl, col0Incl, col1Excl) as SparseMatrix
+  }
+  override SparseMatrix row(int index) {
+    return Matrix.super.row(index) as SparseMatrix
+  }
+  override SparseMatrix col(int index) {
+    return Matrix.super.col(index) as SparseMatrix
+  }
+  override SparseMatrix readOnlyView() {
+    return Matrix.super.readOnlyView() as SparseMatrix
+  }
 }

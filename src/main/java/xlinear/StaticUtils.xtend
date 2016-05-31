@@ -54,6 +54,25 @@ class StaticUtils {
     return result
   }
   
+  static def DenseMatrix createDenseMatrixByCopyingArrayContents(double [] data) {
+    val DenseMatrix result = createEmptyDenseMatrix(data.length, 1);
+    copyTo(data, result)
+    return result
+  }
+  
+  static def SparseMatrix createSparseMatrixByCopyingArrayContents(double [] data) {
+    val SparseMatrix result = createEmptySparseMatrix(data.length, 1);
+    copyTo(data, result)
+    return result
+  }
+  
+  def static private void copyTo(double [] src, Matrix destination) {
+    if (src.length != destination.nRows || destination.nCols != 1)
+      throw new RuntimeException
+    for (var int r = 0; r < src.length; r++)
+      destination.set(r, 0, src.get(r))
+  }
+  
   static def DenseMatrix createEmptyDenseMatrix(int nRows, int nCols) {
     return new CommonsDenseMatrix(new BlockRealMatrix(nRows, nCols))
   }
@@ -82,6 +101,7 @@ class StaticUtils {
   //// Special matrices
   
   static def SparseMatrix identity(int size) {
+    // TODO: create an implicit object?
     val SparseMatrix result = createEmptySparseMatrix(size, size)
     for (var int i = 0; i < size; i++)
       result.set(i, i, 1.0)
@@ -151,14 +171,15 @@ class StaticUtils {
   }
   
   //// Norms
-  
-  static def double norm(Matrix matrix) {
-    val double[] sum = #[0.0]
-    visitSkippingSomeZeros(matrix) [int row, int col, double value |
-      sum.set(0, sum.get(0) + value * value)
-    ]
-    return Math.sqrt(sum.get(0))
-  }
+
+// TODO: should do that with the stream framework  
+//  static def double norm(Matrix matrix) {
+//    val double[] sum = #[0.0]
+//    visitSkippingSomeZeros(matrix) [int row, int col, double value |
+//      sum.set(0, sum.get(0) + value * value)
+//    ]
+//    return Math.sqrt(sum.get(0))
+//  }
   
   //// Below are support methods for +,-,*
   

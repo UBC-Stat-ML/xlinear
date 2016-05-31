@@ -21,4 +21,16 @@ interface DenseMatrix extends Matrix {
   def DenseMatrix multiplyTo(DenseMatrix another) 
   
   override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean readOnly)
+  override DenseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl) {
+    return Matrix.super.slice(row0Incl, row1Excl, col0Incl, col1Excl) as DenseMatrix
+  }
+  override DenseMatrix row(int index) {
+    return Matrix.super.row(index) as DenseMatrix
+  }
+  override DenseMatrix col(int index) {
+    return Matrix.super.col(index) as DenseMatrix
+  }
+  override DenseMatrix readOnlyView() {
+    return Matrix.super.readOnlyView() as DenseMatrix
+  }
 }

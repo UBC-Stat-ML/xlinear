@@ -94,6 +94,8 @@ public class Doc
    * Here are some examples of how to use xlinear, which illustrate important 
    * concepts and design decisions:
    */
+  // TODO: once static analysis is restored, specialize the types in this 
+  //       and add comments that hybrid approach works
   @SuppressWarnings("unused")
   @Tutorial(showSource = true)
   @Test
@@ -162,12 +164,26 @@ public class Doc
    * be sparse or dense as well. All bounds are checked at runtime. 
    */
   @Tutorial(showSource = true)
+  @SuppressWarnings("unused")
   @Test
   public void creationAndSlices() 
   {
-    Matrix vector   = dense(100);        // creates dense 100 x 1 initialized at 0
-    Matrix spVector = sparse(100_000);   // creates sparse 100k x 1 vector init at 0
+    Matrix vector   = dense(100);          // creates dense 100 x 1 initialized at 0
+    Matrix spVector = sparse(100_000);     // creates sparse 100k x 1 vector init at 0
     
-    Matrix identity = identity(100_000); // creates sparse 100k x 100k identity matrix
+    Matrix identity = identity(100_000);   // creates sparse 100k x 100k identity matrix
+    
+    Matrix fromArr  = denseCopy(new double[][]{{1.0, 2.0},{5.4, 6.1}});
+                                           // creates a matrix by copying array
+                                           // in Xtend: denseCopy(#[#[1.0, 2.0], #[5.4, 6.1]])
+    
+    Matrix copy     = denseCopy(spVector); // copy existing sparse or dense into to a new dense
+    
+    Matrix denseVec = denseCopy(new double[]{234.3, 23.4, 0.0}); 
+                                           // N x 1 vector based on copying
+    
+    // sparseCopy(..) works in the same way as the previous three
+    
+    
   }
 }

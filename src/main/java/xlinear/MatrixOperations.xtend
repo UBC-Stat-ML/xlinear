@@ -58,6 +58,10 @@ class MatrixOperations {
   def static DenseMatrix denseCopy(double[][] data) {
     StaticUtils::createDenseMatrixByCopyingArrayContents(data)
   }
+  
+  def static DenseMatrix denseCopy(double[] data) {
+    StaticUtils::createDenseMatrixByCopyingArrayContents(data)
+  }
 
   def static DenseMatrix denseCopy(Matrix matrix) {
     val DenseMatrix result = dense(matrix.nRows, matrix.nCols)
@@ -69,6 +73,10 @@ class MatrixOperations {
     StaticUtils::createSparseMatrixByCopyingArrayContents(data)
   }
   
+  def static SparseMatrix sparseCopy(double[] data) {
+    StaticUtils::createSparseMatrixByCopyingArrayContents(data)
+  }
+  
   def static SparseMatrix sparseCopy(Matrix matrix) {
     val SparseMatrix result = sparse(matrix.nRows, matrix.nCols)
     result += matrix
@@ -76,15 +84,18 @@ class MatrixOperations {
   }
   
   
+  
+  
+  
   //// Norms
   
-  /**
-   * L2 norm of a vector or matrix (in the matrix case it is also known 
-   * as the Frobenius norm).
-   */
-  def static double norm(Matrix m) {
-    StaticUtils::norm(m)
-  } 
+//  /**
+//   * L2 norm of a vector or matrix (in the matrix case it is also known 
+//   * as the Frobenius norm).
+//   */
+//  def static double norm(Matrix m) {
+//    StaticUtils::norm(m)
+//  } 
    
 
 
