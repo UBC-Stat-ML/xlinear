@@ -144,7 +144,7 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     override String toString() {
       // TODO: use views to truncate (ALSO IN VIEW AND SPARSE AND DENSE)
       return StaticUtils::toStringDimensions(this) + " dense matrix" + 
-        if (readOnly) " read-only" else "" + 
+        (if (readOnly) " read-only" else "") + 
         " slice\n" + StaticUtils::toString(this)
     }
   }

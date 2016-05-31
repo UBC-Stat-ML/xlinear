@@ -74,23 +74,7 @@ interface Matrix {
   
   def Matrix createEmpty(int nRows, int nCols)
   
-  static interface SliceProducer<T extends Matrix> {
-    def int nRows()
-    def int nCols()
-    def T slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean makeReadOnly)
-    def T slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl) {
-      return slice(row0Incl, row1Excl, col0Incl, col1Excl, false)
-    }
-    def T row(int index) {
-      return slice(index, index + 1, 0, nCols, false)
-    }
-    def Matrix col(int index) {
-      return slice(0, nRows, index, index + 1, false)
-    }
-    def Matrix readOnlyView() {
-      return slice(0, nRows, 0, nCols, true)
-    }
-  }
+
   
   // TODO: offer implementations of equals, hashcode (use visitSkipSomeZeros? which you may want to add here in interface, or not needed actually)
   // TODO: same for toString, with options to limit # of entries

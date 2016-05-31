@@ -2,7 +2,6 @@ package xlinear
 
 import xlinear.internals.MatrixVisitorViewOnly
 import xlinear.internals.MatrixVisitorEditInPlace
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock
 
 interface SparseMatrix extends Matrix {
     

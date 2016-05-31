@@ -131,7 +131,7 @@ import xlinear.StaticUtils
     override String toString() {
       // TODO: use views to truncate (ALSO IN VIEW AND SPARSE AND DENSE)
       return StaticUtils::toStringDimensions(this) + " sparse matrix" + 
-        if (readOnly) " read-only" else "" + 
+        (if (readOnly) " read-only" else "") + 
         " slice\n" + StaticUtils::toString(this)
     }
   }

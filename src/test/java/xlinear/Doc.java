@@ -157,8 +157,8 @@ public class Doc
   public void sparsity() {}
   
   /**
-   * Matrix/vector creation and slices
-   * ---------------------------------
+   * Matrix/vector creation
+   * -----------------------
    * 
    * There is no special type for vectors, they are just nx1 matrices. They can therefore 
    * be sparse or dense as well. All bounds are checked at runtime. 
@@ -166,24 +166,83 @@ public class Doc
   @Tutorial(showSource = true)
   @SuppressWarnings("unused")
   @Test
-  public void creationAndSlices() 
+  public void creation() 
   {
-    Matrix vector   = dense(100);          // creates dense 100 x 1 initialized at 0
-    Matrix spVector = sparse(100_000);     // creates sparse 100k x 1 vector init at 0
+    DenseMatrix  vector   = dense(100);          // creates dense 100 x 1 initialized at 0
+    SparseMatrix spVector = sparse(100_000);     // creates sparse 100k x 1 vector init at 0
     
-    Matrix identity = identity(100_000);   // creates sparse 100k x 100k identity matrix
+    SparseMatrix identity = identity(100_000);   // creates sparse 100k x 100k identity matrix
     
-    Matrix fromArr  = denseCopy(new double[][]{{1.0, 2.0},{5.4, 6.1}});
-                                           // creates a matrix by copying array
-                                           // in Xtend: denseCopy(#[#[1.0, 2.0], #[5.4, 6.1]])
+    DenseMatrix fromArr   = denseCopy(new double[][]{{1.0, 2.0},{5.4, 6.1}});
+                                                 // creates a matrix by copying array
+                                                 // in Xtend: denseCopy(#[#[1.0, 2.0], #[5.4, 6.1]])
     
-    Matrix copy     = denseCopy(spVector); // copy existing sparse or dense into to a new dense
+    DenseMatrix copy      = denseCopy(spVector); // copy existing sparse or dense into to a new dense
     
-    Matrix denseVec = denseCopy(new double[]{234.3, 23.4, 0.0}); 
-                                           // N x 1 vector based on copying
+    DenseMatrix denseVec  = denseCopy(new double[]{234.3, 23.4, 0.0}); 
+                                                 // N x 1 vector based on copying
     
     // sparseCopy(..) works in the same way as the previous three
+  }
+  
+  /**
+   * Slice and views
+   * ---------------
+   * 
+   * Slices are read/write windows into an existing matrix. Changes in the slice will be reflected 
+   * in the original matrix and vice versa. 
+   * 
+   * Read-only views work similarly except that exceptions are thrown if the user attempts to modify
+   * the obtained slice. If a reference to the original matrix is kept, it is still possible to 
+   * modify the underlying data though. The behavior is therefore similar to 
+   * Collections.unmodifiableCollection(..).
+   * 
+   * One can create a slice of a slice, or a slice of a slice of a slice, etc with no running time 
+   * penalty (the nesting is collapsed internally).
+   * 
+   * Slices work with both dense and sparse arrays. Creating them takes constant time. 
+   * In the dense case, all operations on a pxq slice of an nxm matrix will 
+   * have running times close to the running time of a concrete pxq matrix.
+   * In the sparse case, this it true for random access, but currently the implementation of the 
+   * iteration will internally loop over the entries of the carrier matrix.  
+   * 
+   * However in both dense and sparse slices, when a n^3 operation is computed, internally,
+   * the matrix is copied to an optimal concrete implementation for maximum performance.
+   */
+  @Tutorial(showSource = true)
+  @Test
+  public void slices() 
+  {
+    DenseMatrix originalDense = dense(3, 3);
+    DenseMatrix lastRow      = originalDense.row(2);
     
+    lastRow.set(0,0,100);
+    originalDense.set(2, 2, 10);
+    originalDense.set(0, 0, 1);
+    multEquals(lastRow, 2.0); 
     
+    System.out.println(originalDense);
+    // 3 x 3 dense matrix
+    //         0        1         2      
+    // 0 |     1.00000  0.00000   0.00000
+    // 1 |     0.00000  0.00000   0.00000
+    // 2 |   200.000    0.00000  20.0000 
+    
+    System.out.println(lastRow.slice(0, 1, 0, 2)); // sub slice to keep only first 2 cols
+    // 1 x 3 dense matrix slice
+    //         0      1          
+    // 0 |   200.000  0.00000
+    
+    SparseMatrix originalSparse = sparse(100_000, 100_000);
+    originalSparse.set(0, 0, 41);
+    SparseMatrix sparseView = originalSparse.col(0).readOnlyView().slice(0, 3, 0, 1);
+    System.out.println(sparseView);
+    // 3 x 1 sparse matrix read-only slice
+    //        0      
+    // 0 |   41.0000 
+    // 1 |    0.00000
+    // 2 |    0.00000
+    
+    // multEquals(sparseView, 2); throws UnsupportedOperationException
   }
 }
