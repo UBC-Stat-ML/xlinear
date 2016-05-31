@@ -79,6 +79,16 @@ class StaticUtils {
   }
   
   
+  //// Special matrices
+  
+  static def SparseMatrix identity(int size) {
+    val SparseMatrix result = createEmptySparseMatrix(size, size)
+    for (var int i = 0; i < size; i++)
+      result.set(i, i, 1.0)
+    return result
+  }
+  
+  
   //// toString
   
   /**

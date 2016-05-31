@@ -5,6 +5,7 @@ import tutorialj.Tutorial;
 
 import static xlinear.MatrixOperations.*;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -101,12 +102,14 @@ public class Doc
     // The recommended API is all in MatrixOperations
     // This API uses dispatch methods, so you are not required
     // to keep track of the detailed type of matrices (e.g. sparse vs dense)
-    Matrix m1 = dense(3,100_000);
-    Matrix m2 = sparse(100_000,3);
+    Matrix m1 = dense(3,100_000);  // create dense 3 x 100_000 initialized at 0's 
+    Matrix m2 = sparse(100_000,3); // create sparse ..
 	  
     // We generally follow Java conventions, e.g. matrices are 0-indexed
     m1.set(0, 0, 1);
     m2.set(0, 0, 1);
+    System.out.println(m1.get(0, 0));
+    // 1.0
     
     // Basic operations use a straightforward syntax: 
     
@@ -126,7 +129,6 @@ public class Doc
     Matrix diff = sub(prod, prod); // in Xtend: "var sum = prod - prod"
     
     System.out.println(prod);  
-	  
     // 3 x 3 sparse matrix
     //       0        1        2      
     // 0 |   2.00000  0.00000  0.00000
@@ -151,4 +153,21 @@ public class Doc
    */
   @Tutorial(showSource = false)
   public void sparsity() {}
+  
+  /**
+   * Matrix/vector creation and slices
+   * ---------------------------------
+   * 
+   * There is no special type for vectors, they are just nx1 matrices. They can therefore 
+   * be sparse or dense as well. All bounds are checked at runtime. 
+   */
+  @Tutorial(showSource = true)
+  @Test
+  public void creationAndSlices() 
+  {
+    Matrix vector   = dense(100);        // creates dense 100 x 1 initialized at 0
+    Matrix spVector = sparse(100_000);   // creates sparse 100k x 1 vector init at 0
+    
+    Matrix identity = identity(100_000); // creates sparse 100k x 100k identity matrix
+  }
 }

@@ -8,14 +8,6 @@ class MatrixOperations {
   
   //// Empty matrix creation
   
-  def static Matrix zeros(int nRows, int nCols, boolean sparse) {
-    if (sparse) sparse(nRows, nCols) else dense(nRows, nCols)
-  }
-  
-  def static DenseMatrix zeros(int nRows, int nCols) {
-    dense(nRows, nCols)
-  }
-  
   def static DenseMatrix dense(int nRows, int nCols) {
     StaticUtils::createEmptyDenseMatrix(nRows, nCols)
   }
@@ -27,20 +19,19 @@ class MatrixOperations {
   
   //// Empty vector creation (n x 1)
   
-  def static Matrix zeros(int nRows, boolean sparse) {
-    if (sparse) sparse(nRows) else dense(nRows)
-  }
-  
-  def static DenseMatrix zeros(int nRows) {
-    dense(nRows)
-  }
-  
   def static DenseMatrix dense(int nRows) {
     StaticUtils::createEmptyDenseMatrix(nRows, 1)
   }
   
   def static SparseMatrix sparse(int nRows) {
     StaticUtils::createEmptySparseMatrix(nRows, 1)
+  }
+  
+  
+  //// Special matrices
+  
+  def static SparseMatrix identity(int size) {
+    StaticUtils::identity(size)
   }
   
   
