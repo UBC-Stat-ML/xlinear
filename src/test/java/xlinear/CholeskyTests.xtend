@@ -10,9 +10,9 @@ class CholeskyTests {
   
   @Test
   def void simpleTest() {
-    simpleTest(sparseCopy(smallPosDef))
+    simpleTest(sparseCopy(smallPositiveDefiniteExample)) 
     println("---")
-    simpleTest(denseCopy(smallPosDef))
+    simpleTest(denseCopy(smallPositiveDefiniteExample))
   }
   
   def void simpleTest(Matrix m) {

@@ -199,9 +199,9 @@ class StaticUtils {
   
   //// Below are support methods for +,-,*
   
-  static def SparseMatrix multiply(SparseMatrix sparse, DenseMatrix dense) {
+  static def DenseMatrix multiply(SparseMatrix sparse, DenseMatrix dense) {
     checkMatrixMultiplicationDimensionsMatch(sparse, dense)
-    val SparseMatrix result = sparse.createEmpty(sparse.nRows, dense.nCols)
+    val DenseMatrix result = dense.createEmpty(sparse.nRows, dense.nCols)  
     sparse.visitNonZeros[int m1Row, int sharedDim, double m1Value |
       for (var int m2Col = 0; m2Col < dense.nCols; m2Col++) {
         val m2Value = dense.get(sharedDim, m2Col)
@@ -212,9 +212,9 @@ class StaticUtils {
     return result
   }
   
-  static def SparseMatrix multiply(DenseMatrix dense, SparseMatrix sparse) {
+  static def DenseMatrix multiply(DenseMatrix dense, SparseMatrix sparse) {
     checkMatrixMultiplicationDimensionsMatch(dense, sparse)
-     val SparseMatrix result = sparse.createEmpty(dense.nRows, sparse.nCols)
+     val DenseMatrix result = dense.createEmpty(dense.nRows, sparse.nCols)  
      sparse.visitNonZeros[int sharedDim, int m2Col, double m2Value |
        for (var int m1Row = 0; m1Row < dense.nRows; m1Row++) {
          val m1Value = dense.get(m1Row, sharedDim)

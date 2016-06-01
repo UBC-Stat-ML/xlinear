@@ -119,18 +119,18 @@ public class Doc
     
     // Examples:
     
-    SparseMatrix prod  = m1.mul(m2);    // in Xtend: "var prod   = m1 * m2"
+    DenseMatrix prod  = m1.mul(m2);     // in Xtend: "var prod   = m1 * m2"
     DenseMatrix scaled = m1.mul(4);     // in Xtend: "var scaled = 4 * m1"
     scaled.mulInPlace(5.0);             // in Xtend: "scaled *= 5.0"
     
     prod.addInPlace(prod);              // in Xtend: "var prod += prod"
-    SparseMatrix sum = prod.add(prod);  // in Xtend: "var sum = prod + prod"
+    DenseMatrix sum = prod.add(prod);   // in Xtend: "var sum = prod + prod"
     
     sum.subInPlace(sum);                // in Xtend: "var prod -= prod"
-    SparseMatrix diff = prod.sub(prod); // in Xtend: "var sum = prod - prod"
+    DenseMatrix diff = prod.sub(prod);  // in Xtend: "var sum = prod - prod"
     
     System.out.println(prod);  
-    // 3 x 3 sparse matrix
+    // 3 x 3 dense matrix
     //       0        1        2      
     // 0 |   2.00000  0.00000  0.00000
     // 1 |   0.00000  0.00000  0.00000
@@ -146,8 +146,8 @@ public class Doc
    *     - ``dense + dense = dense`` 
    * - Multiplications: 
    *     - ``sparse * sparse = sparse``
-   *     - ``sparse * dense = sparse`` (and vice versa)
-   *     - ``sparse * sparse = sparse``
+   *     - ``sparse * dense = dense`` (and vice versa)
+   *     - ``dense * dense = sparse``
    * - Scalings:
    *     - ``dense * cnst = dense`` (and vice versa)
    *     - ``sparse * cnst = sparse`` (and vice versa)
@@ -155,7 +155,7 @@ public class Doc
    * If you forget these rules, you can rely on static analysis, e.g.
    * try both ``SparseMatrix prod  = m1.mul(m2);`` and 
    * ``DenseMatrix prod  = m1.mul(m2);`` in the code above and you will 
-   * see that only the former compiles. If you are in a hurry, you can also just 
+   * see that only the latter compiles. If you are in a hurry, you can also just 
    * write ``Matrix prod  = m1.mul(m2);`` and subsequent operations taking prod 
    * as argument will still work the same (in other words we use a hybrid of static and
    * dispatch method binding, where static is used if available, and we fall 
@@ -253,5 +253,30 @@ public class Doc
     // 2 |    0.00000
     
     // sparseView.mulInPlace(2); throws UnsupportedOperationException
+  }
+  
+  /**
+   * Both dense and sparse Cholesky decompositions are supported. In both case, 
+   * simply use ``matrix.cholesky()``. Other common decompositions to be added 
+   * shortly.
+   */
+  @Tutorial(showSource = true)
+  @Test
+  public void chol() {
+    SparseMatrix posDef = sparseCopy(TestData.smallPositiveDefiniteExample);
+    System.out.println(posDef);
+    // 3 x 3 sparse matrix
+    //        0         1         2      
+    // 0 |    2.00000  -1.00000   0.00000
+    // 1 |   -1.00000   2.00000  -1.00000
+    // 2 |    0.00000  -1.00000   2.00000
+    
+    Matrix L = posDef.cholesky().L;
+    System.out.println(L.mul(L.transpose()));
+    // 3 x 3 sparse matrix
+    //        0         1         2      
+    // 0 |    2.00000  -1.00000   0.00000
+    // 1 |   -1.00000   2.00000  -1.00000
+    // 2 |    0.00000  -1.00000   2.00000
   }
 }

@@ -53,8 +53,8 @@ interface Matrix {
   //// matrix *
   
   def Matrix *(Matrix m)
-  def Matrix *(DenseMatrix m)
-  def SparseMatrix *(SparseMatrix m)
+  def DenseMatrix *(DenseMatrix m)
+  def Matrix *(SparseMatrix m)
   
   def Matrix mul(Matrix m) {
     switch m {
@@ -64,8 +64,8 @@ interface Matrix {
         throw StaticUtils::denseOrSparseException
     }
   }
-  def Matrix mul(DenseMatrix m)
-  def SparseMatrix mul(SparseMatrix m)
+  def DenseMatrix mul(DenseMatrix m)
+  def Matrix mul(SparseMatrix m)
   
   
   //// matrix *= : not supported as efficient implementations used here typically 

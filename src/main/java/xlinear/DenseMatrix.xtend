@@ -45,12 +45,15 @@ interface DenseMatrix extends Matrix {
   
   //// matrix * 
   
-  override Matrix *(Matrix m)             { mul(m) }       
+  override DenseMatrix *(Matrix m)        { mul(m) }       
   override DenseMatrix *(DenseMatrix m)   { mul(m) }
-  override SparseMatrix *(SparseMatrix m) { mul(m) }
+  override DenseMatrix *(SparseMatrix m)  { mul(m) }
   
+  override DenseMatrix mul(Matrix m) {
+    return Matrix.super.mul(m) as DenseMatrix
+  }
   override DenseMatrix mul(DenseMatrix m) 
-  override SparseMatrix mul(SparseMatrix m) {
+  override DenseMatrix mul(SparseMatrix m) {
     return StaticUtils::multiply(this, m)
   }
   

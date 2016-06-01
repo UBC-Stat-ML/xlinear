@@ -49,14 +49,11 @@ interface SparseMatrix extends Matrix {
   }
   
   //// matrix * 
-  override SparseMatrix *(Matrix m)        { mul(m) }
-  override SparseMatrix *(DenseMatrix m)   { mul(m) }
+  override Matrix *(Matrix m)              { mul(m) }
+  override DenseMatrix *(DenseMatrix m)    { mul(m) }
   override SparseMatrix *(SparseMatrix m)  { mul(m) }
   
-  override SparseMatrix mul(Matrix m) {
-    return Matrix.super.mul(m) as SparseMatrix
-  }
-  override SparseMatrix mul(DenseMatrix m) {
+  override DenseMatrix mul(DenseMatrix m) {
     return StaticUtils::multiply(this, m)
   }
   override SparseMatrix mul(SparseMatrix m) 
@@ -67,9 +64,6 @@ interface SparseMatrix extends Matrix {
   override DenseMatrix +(DenseMatrix m)   { add(m) }
   override SparseMatrix +(SparseMatrix m) { add(m) }
   
-  override Matrix add(Matrix m) {
-    return Matrix.super.add(m)
-  }
   override DenseMatrix add(DenseMatrix m) {
     return StaticUtils::add(this, m);
   }
@@ -94,9 +88,6 @@ interface SparseMatrix extends Matrix {
   override DenseMatrix -(DenseMatrix m)   { sub(m) }
   override SparseMatrix -(SparseMatrix m) { sub(m) }
   
-  override Matrix sub(Matrix m) {
-    return Matrix.super.sub(m)
-  }
   override DenseMatrix sub(DenseMatrix m) {
     return StaticUtils::subtract(this, m);
   }
