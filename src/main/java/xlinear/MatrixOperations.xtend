@@ -37,12 +37,21 @@ class MatrixOperations {
   
   //// Creating matrices by copying
   
-  def dispatch static SparseMatrix copy(SparseMatrix model) {
+  def static SparseMatrix copy(SparseMatrix model) {
     StaticUtils::copy(model)
   }
   
-  def dispatch static DenseMatrix copy(DenseMatrix model) {
+  def static DenseMatrix copy(DenseMatrix model) {
     StaticUtils::copy(model)
+  }
+  
+  def static Matrix copy(Matrix model) {
+    switch model {
+      SparseMatrix : copy(model)
+      DenseMatrix  : copy(model)
+      default :
+        throw StaticUtils::denseOrSparseException
+    }
   }
   
   /*
@@ -135,210 +144,23 @@ class MatrixOperations {
   
   
   //////// Rest of the file defines +, -, *, +=, -=, *= 
-  
-  //// Matrix multiplication
-  
-  def dispatch static DenseMatrix *(DenseMatrix matrix1, DenseMatrix matrix2) {
-    matrix1.multiplyTo(matrix2)
-  }
-  
-  def dispatch static SparseMatrix *(SparseMatrix matrix1, SparseMatrix matrix2) {
-    matrix1.multiplyTo(matrix2)
-  }
-  
-  def dispatch static SparseMatrix *(SparseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::multiply(matrix1, matrix2)
-  }
-  
-  def dispatch static SparseMatrix *(DenseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::multiply(matrix1, matrix2)
-  }
 
-  @Deprecated
-  def static dispatch void *=(Matrix m1, Matrix m2) {
-    throw new UnsupportedOperationException(
-      "Matrix multiplication cannot be computed more efficiently in place. Use C = A * B; A = C;")
-  }
-  
-  //// Matrix additions
-  
-  def dispatch static DenseMatrix +(DenseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::add(matrix1, matrix2)
-  }
-  
-  def dispatch static SparseMatrix +(SparseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::add(matrix1, matrix2)
-  } 
-  
-  /*
-   * Design note: Adding a sparse matrix to a dense matrix results in a dense matrix.
-   * SparseMatrix's implementation is inefficient when the matrix is in 
-   * fact dense, so we return a DenseMatrix.
-   */
-  def dispatch static DenseMatrix +(SparseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::add(matrix1, matrix2)
-  }
-  
-  def dispatch static DenseMatrix +(DenseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::add(matrix2, matrix1) // ! note: using commutativity of + here
-  }
-  
-  def dispatch static void +=(DenseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::addInPlace(matrix1, matrix2)
-  }
-  
-  def dispatch static void +=(SparseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::addInPlace(matrix1, matrix2)
-  } 
-  
-  def dispatch static void +=(DenseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::addInPlace(matrix1, matrix2)
-  }
-  
-  def dispatch static void +=(SparseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::addInPlace(matrix1, matrix2)
-  }
-  
+
   
   //// Matrix scaling
   
-  def dispatch static DenseMatrix *(DenseMatrix m, Number scalar) {
-    StaticUtils::scale(m, scalar.doubleValue)
+  def static DenseMatrix *(Number scalar, DenseMatrix m) {
+    m.mul(scalar)
   }
   
-  def dispatch static DenseMatrix *(Number scalar, DenseMatrix m) {
-    StaticUtils::scale(m, scalar.doubleValue)
+  def static SparseMatrix *(Number scalar, SparseMatrix m) {
+    m.mul(scalar)
   }
   
-  def dispatch static SparseMatrix *(SparseMatrix m, Number scalar) {
-    StaticUtils::scale(m, scalar.doubleValue)
-  }
-  
-  def dispatch static SparseMatrix *(Number scalar, SparseMatrix m) {
-    StaticUtils::scale(m, scalar.doubleValue)
-  }
-  
-  def dispatch static void *=(DenseMatrix m, Number scalar) {
-    StaticUtils::scaleInPlace(m, scalar.doubleValue)
-  }
-  
-  def dispatch static void *=(SparseMatrix m, Number scalar) {
-    StaticUtils::scaleInPlace(m, scalar.doubleValue)
+  def static Matrix *(Number scalar, Matrix m) {
+    m.mul(scalar)
   }
 
-  
-  //// subtraction 
-  
-  def dispatch static DenseMatrix -(DenseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::subtract(matrix1, matrix2)
-  }
-  
-  def dispatch static SparseMatrix -(SparseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::subtract(matrix1, matrix2)
-  }
-  
-  def dispatch static DenseMatrix -(SparseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::subtract(matrix1, matrix2)  
-  }
-  
-  def dispatch static DenseMatrix -(DenseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::subtract(matrix1, matrix2)
-  }
-  
-  def dispatch static void -=(DenseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::subtractInPlace(matrix1, matrix2)
-  }
-  
-  def dispatch static void -=(SparseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::subtractInPlace(matrix1, matrix2)
-  }
-  
-  def dispatch static void -=(DenseMatrix matrix1, SparseMatrix matrix2) {
-    StaticUtils::subtractInPlace(matrix1, matrix2)
-  }
-  
-  def dispatch static void -=(SparseMatrix matrix1, DenseMatrix matrix2) {
-    StaticUtils::subtractInPlace(matrix1, matrix2)
-  }
-  
-  
-  //// shortcuts for Java users
-  
-  /**
-   * Multiply either two matrices or a matrix and a scalar, equivalent to Xtend's
-   * 
-   * matrixOrScalar1 * matrixOrScalar2
-   * 
-   * This will result in a sparse matrix if at least one (or both) of the two input 
-   * matrices is sparse, otherwise this will result in a dense matrix if all 
-   * matrices involved are dense.
-   */
-  def static Matrix mult(Object matrixOrScalar1, Object matrixOrScalar2) {
-    return operator_multiply(matrixOrScalar1, matrixOrScalar2)
-  }
-  
-  /**
-   * Multiply the matrix in place by a scalar, equivalent to Xtend's
-   * 
-   * matrix *= scalar
-   * 
-   * Sparsity will be preserved.
-   * 
-   * Note that matrix multiplication in place is not implemented since efficient 
-   * matrix routines typically need to write in a fresh matrix.
-   * 
-   */
-  def static void multEquals(Matrix matrix, Number scalar) {
-    operator_multiplyAssign(matrix, scalar)
-  }
-  
-  /**
-   * Add two matrices, equivalent to Xtend's
-   * 
-   * matrix1 + matrix2
-   * 
-   * This will result in a dense matrix if at least one (or both) of the input 
-   * matrices is dense, otherwise this will result in a sparse matrix if the two 
-   * matrices are sparse.
-   */
-  def static Matrix add(Matrix matrix1, Matrix matrix2) {
-    return operator_plus(matrix1, matrix2)
-  }
-  
-  /**
-   * Add in place matrix2 into matrix1, equivalent to Xtend's
-   * 
-   * matrix1 += matrix2
-   * 
-   * The type (dense/sparse) of matrix1 is forced to stay the same.
-   */
-  def static void addEquals(Matrix matrix1, Matrix matrix2 ) {
-    operator_add(matrix1, matrix2)
-  }
-  
-  /**
-   * Subtract two matrices, equivalent to Xtend's
-   * 
-   * matrix1 - matrix2
-   * 
-   * This will result in a dense matrix if at least one (or both) of the input 
-   * matrices is dense, otherwise this will result in a sparse matrix if the two 
-   * matrices are sparse.
-   */
-  def static Matrix sub(Matrix matrix1, Matrix matrix2) {
-    return operator_minus(matrix1, matrix2)
-  }
-  
-  /**
-   * Subtract in place matrix2 from matrix1, equivalent to Xtend's
-   * 
-   * matrix1 -= matrix2
-   * 
-   * The type (dense/sparse) of matrix1 is forced to stay the same.
-   */
-  def static void subEquals(Matrix matrix1, Matrix matrix2) {
-    operator_remove(matrix1, matrix2)
-  }
   
   private new() {}
 }

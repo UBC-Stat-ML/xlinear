@@ -82,8 +82,8 @@ concepts and design decisions:
 // The recommended API is all in MatrixOperations
 // This API uses dispatch methods, so you are not required
 // to keep track of the detailed type of matrices (e.g. sparse vs dense)
-Matrix m1 = dense(3,100_000);  // create dense 3 x 100_000 initialized at 0's 
-Matrix m2 = sparse(100_000,3); // create sparse ..
+DenseMatrix  m1 = dense(3,100_000);  // create dense 3 x 100_000 initialized at 0's 
+SparseMatrix m2 = sparse(100_000,3); // create sparse ..
 
 // We generally follow Java conventions, e.g. matrices are 0-indexed
 m1.set(0, 0, 1);
@@ -93,20 +93,20 @@ System.out.println(m1.get(0, 0));
 
 // Basic operations use a straightforward syntax: 
 
-// mult(mtxOrScalar1,mtxOrScalar2), add(mtx1,mtx2), sub(mtx1,mtx2), which do not modify the inputs
-// multEquals(mtx1, scalar), addEquals(mtx1, mtx2), subEquals(mtx1, mtx2), which modify mtx1
+// mtx1.mul(mtxOrScalar), mtx1.add(mtx2), mtx1.sub(mtx2), which do not modify the inputs
+// mtx1.mulInPlace(scalar), mtx1.addInPlace(mtx2), mtx1.subInPlace(mtx2), which modify mtx1
 
 // Examples:
 
-Matrix prod = mult(m1, m2);    // in Xtend: "var prod   = m1 * m2"
-Matrix scaled = mult(4, m1);   // in Xtend: "var scaled = 4 * m1"
-multEquals(scaled, 5.0);       // in Xtend: "scaled *= 5.0"
+SparseMatrix prod  = m1.mul(m2);    // in Xtend: "var prod   = m1 * m2"
+DenseMatrix scaled = m1.mul(4);     // in Xtend: "var scaled = 4 * m1"
+scaled.mulInPlace(5.0);             // in Xtend: "scaled *= 5.0"
 
-addEquals(prod, prod);         // in Xtend: "var prod += prod"
-Matrix sum = add(prod, prod);  // in Xtend: "var sum = prod + prod"
+prod.addInPlace(prod);              // in Xtend: "var prod += prod"
+SparseMatrix sum = prod.add(prod);  // in Xtend: "var sum = prod + prod"
 
-subEquals(sum, sum);           // in Xtend: "var prod -= prod"
-Matrix diff = sub(prod, prod); // in Xtend: "var sum = prod - prod"
+sum.subInPlace(sum);                // in Xtend: "var prod -= prod"
+SparseMatrix diff = prod.sub(prod); // in Xtend: "var sum = prod - prod"
 
 System.out.println(prod);  
 // 3 x 3 sparse matrix
@@ -129,6 +129,16 @@ Sparsity is correctly inferred using these rules:
 - Scalings:
     - ``dense * cnst = dense`` (and vice versa)
     - ``sparse * cnst = sparse`` (and vice versa)
+    
+If you forget these rules, you can rely on static analysis, e.g.
+try both ``SparseMatrix prod  = m1.mul(m2);`` and 
+``DenseMatrix prod  = m1.mul(m2);`` in the code above and you will 
+see that only the former compiles. If you are in a hurry, you can also just 
+write ``Matrix prod  = m1.mul(m2);`` and the type of prod will be 
+correctly inferred at runtime (in other words we use a hybrid of static and
+dispatch method binding, where static is used if available, and we fall 
+back to dispatch if static type if not provided, to ensure the optimal 
+algorithm is always selected for the types of matrices provided).
 
 
 Matrix/vector creation
@@ -169,9 +179,9 @@ Collections.unmodifiableCollection(..).
 One can create a slice of a slice, or a slice of a slice of a slice, etc with no running time 
 penalty (the nesting is collapsed internally).
 
-Slices work with both dense and sparse arrays. Creating them takes constant time. 
-In the dense case, all operations on a pxq slice of an nxm matrix will 
-have running times close to the running time of a concrete pxq matrix.
+Slices work with both dense and sparse matrices. Creating them takes constant time. 
+In the dense case, all operations on a p-by-q slice of an n-by-m matrix will 
+have running times close to the running time of a concrete p-by-q matrix.
 In the sparse case, this it true for random access, but currently the implementation of the 
 iteration will internally loop over the entries of the carrier matrix.  
 
@@ -180,12 +190,12 @@ the matrix is copied to an optimal concrete implementation for maximum performan
 
 ```java
 DenseMatrix originalDense = dense(3, 3);
-DenseMatrix lastRow      = originalDense.row(2);
+DenseMatrix lastRow       = originalDense.row(2);
 
 lastRow.set(0,0,100);
 originalDense.set(2, 2, 10);
 originalDense.set(0, 0, 1);
-multEquals(lastRow, 2.0); 
+lastRow.mulInPlace(2.0); 
 
 System.out.println(originalDense);
 // 3 x 3 dense matrix
@@ -209,6 +219,6 @@ System.out.println(sparseView);
 // 1 |    0.00000
 // 2 |    0.00000
 
-// multEquals(sparseView, 2); throws UnsupportedOperationException
+// sparseView.mulInPlae(2); throws UnsupportedOperationException
 ```
 

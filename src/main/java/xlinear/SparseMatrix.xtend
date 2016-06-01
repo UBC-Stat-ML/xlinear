@@ -29,7 +29,87 @@ interface SparseMatrix extends Matrix {
   
   override SparseMatrix createEmpty(int nRows, int nCols)
   
-  def SparseMatrix multiplyTo(SparseMatrix another)
+  //// scalar *
+  
+  override SparseMatrix *(Number n)   { return mul(n) }
+  override SparseMatrix mul(Number n) {
+    return StaticUtils::scale(this, n.doubleValue)
+  }
+  
+  //// scalar *=
+  
+  override void mulInPlace(Number n) {
+    StaticUtils::scaleInPlace(this, n.doubleValue)
+  }
+  
+  //// matrix * 
+  override SparseMatrix *(Matrix m)        { mul(m) }
+  override SparseMatrix *(DenseMatrix m)   { mul(m) }
+  override SparseMatrix *(SparseMatrix m)  { mul(m) }
+  
+  override SparseMatrix mul(Matrix m) {
+    return Matrix.super.mul(m) as SparseMatrix
+  }
+  override SparseMatrix mul(DenseMatrix m) {
+    return StaticUtils::multiply(this, m)
+  }
+  override SparseMatrix mul(SparseMatrix m) 
+  
+  //// +
+  
+  override Matrix +(Matrix m)             { add(m) }       
+  override DenseMatrix +(DenseMatrix m)   { add(m) }
+  override SparseMatrix +(SparseMatrix m) { add(m) }
+  
+  override Matrix add(Matrix m) {
+    return Matrix.super.add(m)
+  }
+  override DenseMatrix add(DenseMatrix m) {
+    return StaticUtils::add(this, m);
+  }
+  override SparseMatrix add(SparseMatrix m) {
+    return StaticUtils::add(this, m);
+  }
+  
+  
+  //// +=
+  
+  override void addInPlace(DenseMatrix m) {
+    StaticUtils::addInPlace(this, m)
+  }
+  override void addInPlace(SparseMatrix m) {
+    StaticUtils::addInPlace(this, m)
+  }
+  
+  
+  //// -
+  
+  override Matrix -(Matrix m)             { sub(m) }       
+  override DenseMatrix -(DenseMatrix m)   { sub(m) }
+  override SparseMatrix -(SparseMatrix m) { sub(m) }
+  
+  override Matrix sub(Matrix m) {
+    return Matrix.super.sub(m)
+  }
+  override DenseMatrix sub(DenseMatrix m) {
+    return StaticUtils::subtract(this, m);
+  }
+  override SparseMatrix sub(SparseMatrix m) {
+    return StaticUtils::subtract(this, m);
+  }
+  
+  
+  //// +=
+  
+  override void subInPlace(DenseMatrix m) {
+    StaticUtils::subtractInPlace(this, m)
+  }
+  override void subInPlace(SparseMatrix m) {
+    StaticUtils::subtractInPlace(this, m)
+  }
+  
+  
+  //// slices
   
   override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl, boolean makeReadOnly)
   override SparseMatrix slice(int row0Incl, int row1Excl, int col0Incl, int col1Excl) {

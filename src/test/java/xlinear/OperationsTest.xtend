@@ -173,11 +173,11 @@ class OperationsTest {
     assertThrownExceptionMatches([sparses1.provide(dataB) * denses2.provide(dataC)],new DimensionMismatchException(3,2)) 
     assertThrownExceptionMatches([denses1.provide(dataB)  * sparses2.provide(dataC)],new DimensionMismatchException(3,2)) 
     
-    // check unsupported *= operations
-    assertTypeOfThrownExceptionMatches([denses1.provide(dataB)  *= denses2.provide(dataC)], new UnsupportedOperationException)
-    assertTypeOfThrownExceptionMatches([sparses1.provide(dataB) *= sparses2.provide(dataC)], new UnsupportedOperationException)
-    assertTypeOfThrownExceptionMatches([sparses1.provide(dataB) *= denses2.provide(dataC)], new UnsupportedOperationException)
-    assertTypeOfThrownExceptionMatches([denses1.provide(dataB)  *= sparses2.provide(dataC)], new UnsupportedOperationException)
+//    // check unsupported *= operations
+//    assertTypeOfThrownExceptionMatches([denses1.provide(dataB)  *= denses2.provide(dataC)], new UnsupportedOperationException)
+//    assertTypeOfThrownExceptionMatches([sparses1.provide(dataB) *= sparses2.provide(dataC)], new UnsupportedOperationException)
+//    assertTypeOfThrownExceptionMatches([sparses1.provide(dataB) *= denses2.provide(dataC)], new UnsupportedOperationException)
+//    assertTypeOfThrownExceptionMatches([denses1.provide(dataB)  *= sparses2.provide(dataC)], new UnsupportedOperationException)
     
   }
   
@@ -229,10 +229,10 @@ class OperationsTest {
     return result
   }
     
-  def static Matrix multByMultInPlace(Matrix m1, Matrix m2) {
-    m1 *= m2
-    return m1
-  }
+//  def static Matrix multByMultInPlace(Matrix m1, Matrix m2) {
+//    m1 *= m2
+//    return m1
+//  }
   
   def static Matrix addByAddInPlace(Matrix m1, Matrix m2) {
     m1 += m2 

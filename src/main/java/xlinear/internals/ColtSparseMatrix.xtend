@@ -31,7 +31,7 @@ import xlinear.StaticUtils
     return new ColtSparseMatrixSlice(this, row0Incl, row1Excl, col0Incl, col1Excl, readOnly)
   }
   
-  override ColtSparseMatrix multiplyTo(SparseMatrix another) {
+  override ColtSparseMatrix mul(SparseMatrix another) {
     StaticUtils::checkMatrixMultiplicationDimensionsMatch(this, another)
     // TODO: if big, attempt JEigen?
     switch another {
@@ -41,7 +41,7 @@ import xlinear.StaticUtils
         return result
       }
       default : 
-        return multiplyTo(convert(another)) // TODO: if small, use default implementation instead?
+        return mul(convert(another)) // TODO: if small, use default implementation instead?
     }
   }
   
@@ -122,10 +122,10 @@ import xlinear.StaticUtils
       return root().createEmpty(nRows, nCols)
     }
     
-    override SparseMatrix multiplyTo(SparseMatrix another) {
+    override SparseMatrix mul(SparseMatrix another) {
       // The cost of copying is negligible for matrix multiplication
       val SparseMatrix copy = StaticUtils::copy(this)
-      return copy.multiplyTo(another)
+      return copy.mul(another)
     }
     
     override String toString() {

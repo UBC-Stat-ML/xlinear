@@ -1,45 +1,7 @@
 package xlinear
 
 
-/*
- * Design notes
- * 
- * Objective: a matrix library for the xblang probabilistic programming language.
- * 
- * General design goals:
- *  1. simplicity
- *  2. all features needed for design of probability models should be offered
- *  3. reasonable performance
- * 
- * Features decisions for first release:
- *  - Support overloading of +,-,*
- *  - All dense matrix common operations, functions, decompositions
- *  - Views into entries
- *  - Mutability: interfaces used in model building does not allow modif, 
- *      implementations do (so that samplers can be defined) <- skip this?
- *  - Basic sparse matrix features (needed for Sparse precision Gaussian)
- *  - Start with MathCommons instead of JBlas for dense
- *      (will need for fallback anyways, and it's 4-5x faster for 2x2 matrices)
- *  - Implementation of the interface should take minimal effort 
- *      (examples of use case: designing simplex vector distribution, matrix of Dirichlets, etc)
- * 
- * Not needed in first release:
- *  - Only double storage offered, float less reliable for probabilistic inference
- *  - Complex support not so useful for probabilistic inference? also better get them via composition A + i * B
- *  - Avoid separate Vector, SquareMatrix, etc. 
- *    - Type checker is not good enough to cover all cases.
- *    - Marginal utility of having partial coverage. Just check at runtime. 
- *    - Instead, use dispatch functions for dot(.,.), chol(.), etc
- * 
- * Design notes:
- *  - Difficulty in previous package is that there are theoretically several axes to pack in the
- *    class hierarchy: (double/float x real/complex) x vec/sqr/general/colVec x storage strategies(dense/sparse/..)
- *    - Type erasure makes it hard to approach in a generic framework
- *    - Resorting to unwindy class names is not user friendly and lead to bloated code bases
- *    - Solution in our case: only the storage strategy axis really matters
- * 
- */
-  
+
 /**
  * Note: it is not recommended that the user implements this interface
  *   directly, since many operators depend on more detailed knowledge of 
@@ -74,7 +36,107 @@ interface Matrix {
   
   def Matrix createEmpty(int nRows, int nCols)
   
-
+  
+  //// scalar *
+  
+  def Matrix *(Number n)
+  def Matrix mul(Number n)
+  
+  
+  //// scalar *=
+  
+  def void *=(Number n) { mulInPlace(n) }
+  def void mulInPlace(Number n)
+  
+  //// matrix *
+  
+  def Matrix *(Matrix m)
+  def Matrix *(DenseMatrix m)
+  def SparseMatrix *(SparseMatrix m)
+  
+  def Matrix mul(Matrix m) {
+    switch m {
+      SparseMatrix  : return mul(m)
+      DenseMatrix   : return mul(m)
+      default :
+        throw StaticUtils::denseOrSparseException
+    }
+  }
+  def Matrix mul(DenseMatrix m)
+  def SparseMatrix mul(SparseMatrix m)
+  
+  
+  //// matrix *= : not supported as efficient implementations used here typically 
+  ////             need an extra matrix anyways
+  
+  //// +
+  
+  def Matrix +(Matrix m)         
+  def DenseMatrix +(DenseMatrix m)  
+  def Matrix +(SparseMatrix m) 
+  
+  def Matrix add(Matrix m) {
+    switch m {
+      SparseMatrix : return add(m)
+      DenseMatrix  : return add(m)
+      default :
+        throw StaticUtils::denseOrSparseException
+    }
+  }
+  def DenseMatrix add(DenseMatrix m)
+  def Matrix add(SparseMatrix m)
+  
+  //// +=
+  
+  def void +=(Matrix m)       { addInPlace(m) }
+  def void +=(DenseMatrix m)  { addInPlace(m) }
+  def void +=(SparseMatrix m) { addInPlace(m) }
+  
+  def void addInPlace(Matrix m) {
+    switch m {
+      DenseMatrix  : addInPlace(m)
+      SparseMatrix : addInPlace(m)
+      default :
+        throw StaticUtils::denseOrSparseException
+    }
+  }
+  def void addInPlace(DenseMatrix m)
+  def void addInPlace(SparseMatrix m)
+  
+  //// -
+  
+  def Matrix -(Matrix m)         
+  def DenseMatrix -(DenseMatrix m)  
+  def Matrix -(SparseMatrix m) 
+  
+  def Matrix sub(Matrix m) {
+    switch m {
+      SparseMatrix : return sub(m)
+      DenseMatrix  : return sub(m)
+      default :
+        throw StaticUtils::denseOrSparseException
+    }
+  }
+  def DenseMatrix sub(DenseMatrix m)
+  def Matrix sub(SparseMatrix m)
+  
+  
+  //// -=
+  
+  def void -=(Matrix m)       { subInPlace(m) }
+  def void -=(DenseMatrix m)  { subInPlace(m) }
+  def void -=(SparseMatrix m) { subInPlace(m) }
+  
+  def void subInPlace(Matrix m) {
+    switch m {
+      DenseMatrix  : subInPlace(m)
+      SparseMatrix : subInPlace(m)
+      default :
+        throw StaticUtils::denseOrSparseException
+    }
+  }
+  def void subInPlace(DenseMatrix m)
+  def void subInPlace(SparseMatrix m)
   
   // TODO: offer implementations of equals, hashcode (use visitSkipSomeZeros? which you may want to add here in interface, or not needed actually)
   // TODO: same for toString, with options to limit # of entries

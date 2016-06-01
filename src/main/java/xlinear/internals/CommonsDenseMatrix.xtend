@@ -32,14 +32,14 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
     })
   }
   
-  override CommonsDenseMatrix multiplyTo(DenseMatrix another) {
+  override CommonsDenseMatrix mul(DenseMatrix another) {
     StaticUtils::checkMatrixMultiplicationDimensionsMatch(this, another)
     // TODO: if big, attempt JBlas/JEigen?
     switch another {
       CommonsDenseMatrix : 
         return new CommonsDenseMatrix(this.implementation.multiply(another.implementation))
       default : 
-        return multiplyTo(convert(another)) // TODO: if small, use default implementation instead?
+        return mul(convert(another)) // TODO: if small, use default implementation instead?
     }
   }
   
@@ -135,10 +135,10 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
       return root().createEmpty(nRows, nCols)
     }
     
-    override DenseMatrix multiplyTo(DenseMatrix another) {
+    override DenseMatrix mul(DenseMatrix another) {
       // The cost of copying is negligible for matrix multiplication
       val DenseMatrix copy = StaticUtils::copy(this)
-      return copy.multiplyTo(another)
+      return copy.mul(another)
     }
     
     override String toString() {
