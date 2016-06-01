@@ -134,8 +134,8 @@ If you forget these rules, you can rely on static analysis, e.g.
 try both ``SparseMatrix prod  = m1.mul(m2);`` and 
 ``DenseMatrix prod  = m1.mul(m2);`` in the code above and you will 
 see that only the former compiles. If you are in a hurry, you can also just 
-write ``Matrix prod  = m1.mul(m2);`` and the type of prod will be 
-correctly inferred at runtime (in other words we use a hybrid of static and
+write ``Matrix prod  = m1.mul(m2);`` and subsequent operations taking prod 
+as argument will still work the same (in other words we use a hybrid of static and
 dispatch method binding, where static is used if available, and we fall 
 back to dispatch if static type if not provided, to ensure the optimal 
 algorithm is always selected for the types of matrices provided).
@@ -219,6 +219,6 @@ System.out.println(sparseView);
 // 1 |    0.00000
 // 2 |    0.00000
 
-// sparseView.mulInPlae(2); throws UnsupportedOperationException
+// sparseView.mulInPlace(2); throws UnsupportedOperationException
 ```
 
