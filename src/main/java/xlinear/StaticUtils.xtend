@@ -97,6 +97,22 @@ class StaticUtils {
     return result
   }
   
+  def static ColtSparseMatrix convertToColtSparseMatrix(SparseMatrix model) {
+    val ColtSparseMatrix result = new ColtSparseMatrix(new SparseDoubleMatrix2D(model.nRows, model.nCols))
+    model.visitNonZeros[int row, int col, double currentValue |
+      result.set(row, col, currentValue)
+    ]
+    return result
+  }
+  
+  def static CommonsDenseMatrix convertToCommonsDenseMatrix(DenseMatrix model) {
+    val CommonsDenseMatrix result = new CommonsDenseMatrix(new BlockRealMatrix(model.nRows, model.nCols))
+    result.editInPlace[int row, int col, double currentValue |
+      return model.get(row, col)
+    ]
+    return result
+  }
+  
   
   //// Special matrices
   

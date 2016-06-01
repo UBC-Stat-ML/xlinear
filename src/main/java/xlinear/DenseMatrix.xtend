@@ -17,7 +17,18 @@ interface DenseMatrix extends Matrix {
   def void editInPlace(MatrixVisitorEditInPlace visitor)
   
   override DenseMatrix createEmpty(int nRows, int nCols)
+    
+  override CholeskyDecomposition cholesky() {
+    return StaticUtils::convertToCommonsDenseMatrix(this).cholesky()
+  }
   
+  override DenseMatrix transpose() {
+    val DenseMatrix result = createEmpty(nCols, nRows)
+    result.editInPlace[int row, int col, double value |
+      return this.get(col, row)
+    ]
+    return result
+  }
   
   //// scalar * 
   

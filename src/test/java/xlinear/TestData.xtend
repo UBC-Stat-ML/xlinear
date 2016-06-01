@@ -30,4 +30,11 @@ class TestData {
   val public static double[][] a2 = new Array2DRowRealMatrix(dataA).scalarMultiply(2.0).data
   val public static double[][] prod = new Array2DRowRealMatrix(dataC).multiply(new Array2DRowRealMatrix(dataD)).dataRef
   
+  val public static double[][] smallPosDef = #[
+    #[ 2, -1,   0],
+    #[-1,  2,  -1],
+    #[ 0, -1,   2]
+  ]
+  
+  
 }

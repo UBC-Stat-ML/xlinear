@@ -6,10 +6,12 @@ import org.apache.commons.math3.linear.BlockRealMatrix
 import org.apache.commons.math3.linear.RealMatrixChangingVisitor
 import xlinear.StaticUtils
 import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
+import xlinear.CholeskyDecomposition
+import org.apache.commons.math3.linear.RealMatrix
 
 @Data class CommonsDenseMatrix implements DenseMatrix {
   
-  val BlockRealMatrix implementation
+  val RealMatrix implementation
   
   override void visit(MatrixVisitorViewOnly visitor) {
     // Wrap around Commons' verbose interface
@@ -39,16 +41,17 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
       CommonsDenseMatrix : 
         return new CommonsDenseMatrix(this.implementation.multiply(another.implementation))
       default : 
-        return mul(convert(another)) // TODO: if small, use default implementation instead?
+        return mul(StaticUtils::convertToCommonsDenseMatrix(another)) // TODO: if small, use default implementation instead?
     }
   }
   
-  def static private DenseMatrix convert(DenseMatrix model) {
-    val CommonsDenseMatrix result = new CommonsDenseMatrix(new BlockRealMatrix(model.nRows, model.nCols))
-    result.editInPlace[int row, int col, double currentValue |
-      model.get(row, col)
-    ]
-    return result
+  override CholeskyDecomposition cholesky() {
+    // TODO: catch exceptions to harmonize them with Dense
+    // TODO: attempt to use JEigen if matrix is large
+    val chol = 
+      new org.apache.commons.math3.linear.CholeskyDecomposition(implementation)
+    val CommonsDenseMatrix L = new CommonsDenseMatrix(chol.l)
+    return new CholeskyDecomposition(L.readOnlyView);
   }
   
   override CommonsDenseMatrix createEmpty(int nRows, int nCols) {

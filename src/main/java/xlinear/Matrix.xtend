@@ -36,6 +36,8 @@ interface Matrix {
   
   def Matrix createEmpty(int nRows, int nCols)
   
+  def CholeskyDecomposition cholesky()
+  def Matrix transpose()
   
   //// scalar *
   

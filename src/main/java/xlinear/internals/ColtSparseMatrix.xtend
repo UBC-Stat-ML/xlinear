@@ -4,10 +4,20 @@ import xlinear.SparseMatrix
 import org.eclipse.xtend.lib.annotations.Data
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D
 import xlinear.StaticUtils
+import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleCholeskyDecomposition
+import cern.colt.matrix.tdouble.DoubleMatrix2D
+import xlinear.CholeskyDecomposition
 
+/*
+ * Design decision: for first version, use Colt instead of Math Commons sparse matrices,
+ * because Math Commons has the artificial restriction that nRows * nCols has to 
+ * be smaller than Integer.MAX_VALUE (no matter how sparse it is).
+ * Colt can hold up to Integer.LONG_VALUE (but this is poorly documented), which 
+ * should be more than enough; for more would need more than int's for rows and cols.
+ */
 @Data class ColtSparseMatrix implements SparseMatrix {
   
-  val SparseDoubleMatrix2D implementation
+  val DoubleMatrix2D implementation
   
   override void visitNonZeros(MatrixVisitorViewOnly visitor) {
     implementation.forEachNonZero[int row, int col, double value |
@@ -40,17 +50,25 @@ import xlinear.StaticUtils
         implementation.zMult(another.implementation, result.implementation)
         return result
       }
-      default : 
-        return mul(convert(another)) // TODO: if small, use default implementation instead?
+      default :  // TODO: if small, use default implementation instead?
+        return mul(StaticUtils::convertToColtSparseMatrix(another)) 
     }
   }
   
-  def static private SparseMatrix convert(SparseMatrix model) {
-    val ColtSparseMatrix result = new ColtSparseMatrix(new SparseDoubleMatrix2D(model.nRows, model.nCols))
-    model.visitNonZeros[int row, int col, double currentValue |
-      result.set(row, col, currentValue)
-    ]
-    return result
+  override CholeskyDecomposition cholesky() {
+    // TODO: catch exceptions to harmonize them with Dense
+    // TODO: attempt to use JEigen if matrix is large
+    switch implementation {
+      SparseDoubleMatrix2D : {
+        val SparseDoubleCholeskyDecomposition chol = 
+          new SparseDoubleCholeskyDecomposition(
+              implementation.getColumnCompressed(false), 0)
+        val SparseMatrix L = new ColtSparseMatrix(chol.l)
+        return new CholeskyDecomposition(L.readOnlyView)
+      }
+      default :
+        return StaticUtils::convertToColtSparseMatrix(this).cholesky()
+    }
   }
   
   override int nRows() {

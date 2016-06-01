@@ -14,7 +14,7 @@ import java.util.List
 /** 
  * Systematic check of all combinations of sparse/dense/scalar +, -, +=, -=, *, *=
  */
-class OperationsTest {
+class OperationsTests {
   
   static private interface MatrixProvider {
     def Matrix provide(double [][] data)
