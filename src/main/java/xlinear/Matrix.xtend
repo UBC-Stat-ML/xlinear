@@ -34,6 +34,20 @@ interface Matrix {
   def double get(int row, int col)
   def void set(int row, int col, double v)
   
+  /**
+   * If this matrix is a vector (either n by 1, or 1 by n),
+   * return the value at given index, otherwise, throw 
+   * the StaticUtils::notAVectorException exception.
+   */
+  def double get(int index) {
+    if (nRows() != 1 || nCols() != 1) 
+      throw StaticUtils::notAVectorException
+    if (nRows() == 1)
+      return get(0, index)
+    else
+      return get(index, 0)
+  }
+  
   def Matrix createEmpty(int nRows, int nCols)
   
   def CholeskyDecomposition cholesky()

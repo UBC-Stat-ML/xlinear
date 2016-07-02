@@ -388,6 +388,7 @@ class StaticUtils {
     new DimensionMismatchException(Math::max(d1, d2), Math::min(d1, d2))
   }
   
+  val public  static notAVectorException = new RuntimeException("This operation is only supported on a 1 by n or n by 1 matrix.")
   val package static denseOrSparseException = new RuntimeException("Either a SparseMatrix or DenseMatrix required.")
   val package static notBothSparseAndDense = new RuntimeException("A matrix should not be both a SparseMatrix and a DenseMatrix")
 }
