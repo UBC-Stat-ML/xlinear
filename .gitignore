@@ -6,3 +6,5 @@ bin
 bin/xlinear
 bin/xlinear/Main.class
 build
+src/main/xtend-gen
+src/test/xtend-gen
