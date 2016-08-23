@@ -12,10 +12,7 @@ buildscript {
   dependencies {
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.5-beta-1'
   }
-}
 
-
-buildscript {
   repositories {
     maven {
       url "https://plugins.gradle.org/m2/"
@@ -42,7 +39,7 @@ task wrapper(type: Wrapper) {
 
 uploadArchives {
   repositories.mavenDeployer {
-    repository(url: "file:///Users/bouchard/Documents/web/public_html/maven/")
+    repository(url: "file:///${System.properties['user.home']}/artifacts/")
     pom.version = "1.0.1"
     pom.artifactId = "xlinear"
     pom.groupId = "ca.ubc.stat"
@@ -56,14 +53,13 @@ eclipse {
 }
 
 repositories {
-  mavenCentral()
-  jcenter()
   maven {
-    url "file:///Users/bouchard/Documents/web/public_html/maven/"
+    url "https://ubc-stat-ml.github.io/artifacts/"
   }
   maven {
     url "http://www.stat.ubc.ca/~bouchard/maven/"
   }
+  jcenter()
 }
 
 dependencies {
