@@ -43,7 +43,7 @@ task wrapper(type: Wrapper) {
 uploadArchives {
   repositories.mavenDeployer {
     repository(url: "file:///Users/bouchard/Documents/web/public_html/maven/")
-    pom.version = "1.0.0"
+    pom.version = "1.0.1"
     pom.artifactId = "xlinear"
     pom.groupId = "ca.ubc.stat"
   }

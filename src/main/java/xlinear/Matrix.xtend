@@ -30,6 +30,9 @@ interface Matrix {
   
   def int nRows()
   def int nCols()
+  def int nEntries() {
+    return nRows() * nCols()
+  }
 
   def double get(int row, int col)
   def void set(int row, int col, double v)
