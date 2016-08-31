@@ -3,6 +3,7 @@ package xlinear
 import xlinear.DenseMatrix
 import xlinear.SparseMatrix
 import xlinear.StaticUtils
+import xlinear.internals.JavaUtils
 
 class MatrixOperations {
   
@@ -93,7 +94,11 @@ class MatrixOperations {
   }
   
   
+  //// Conversion into other representation
   
+  def static double[][] toArray(Matrix m) {
+    return JavaUtils::toArray(m)
+  }
   
   
   //// Norms
