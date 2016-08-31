@@ -43,12 +43,16 @@ interface Matrix {
    * the StaticUtils::notAVectorException exception.
    */
   def double get(int index) {
-    if (nRows() != 1 || nCols() != 1) 
+    if (!isVector()) 
       throw StaticUtils::notAVectorException
     if (nRows() == 1)
       return get(0, index)
     else
       return get(index, 0)
+  }
+  
+  def boolean isVector() {
+    return nRows() == 1 || nCols() == 1
   }
   
   def Matrix createEmpty(int nRows, int nCols)
