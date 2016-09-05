@@ -4,19 +4,18 @@ import xlinear.Matrix
 import org.eclipse.xtend.lib.annotations.Data
 import xlinear.StaticUtils
 
-// Use this to also offer read-only functionality?
 
 @Data abstract class Slice implements Matrix {
   
   /**
    * The concrete matrix that is viewed by this MatrixView instance.
    */
-  val protected Matrix rootMatrix
+  val public Matrix rootMatrix
    
-  val protected int row0Incl
-  val protected int row1Excl
-  val protected int col0Incl
-  val protected int col1Excl
+  val public int row0Incl
+  val public int row1Excl
+  val public int col0Incl
+  val public int col1Excl
   
   val protected boolean readOnly
   
