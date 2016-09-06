@@ -4,6 +4,7 @@ import xlinear.DenseMatrix
 import xlinear.SparseMatrix
 import xlinear.StaticUtils
 import xlinear.internals.JavaUtils
+import java.util.stream.DoubleStream
 
 class MatrixOperations {
   
@@ -99,18 +100,20 @@ class MatrixOperations {
   def static double[][] toArray(Matrix m) {
     return JavaUtils::toArray(m)
   }
+    
+  
+  //// Norms, etc
+  
+  def static double sum(Matrix m) {
+    m.nonZeroEntries().sum()
+  }
   
   
-  //// Norms
+  def static double norm(Matrix m) {
+    val double sumOfSqrs = m.nonZeroEntries().map[double value | value * value].sum()
+    return Math.sqrt(sumOfSqrs)
+  }
   
-//  /**
-//   * L2 norm of a vector or matrix (in the matrix case it is also known 
-//   * as the Frobenius norm).
-//   */
-//  def static double norm(Matrix m) {
-//    StaticUtils::norm(m)
-//  } 
-   
 
 
 

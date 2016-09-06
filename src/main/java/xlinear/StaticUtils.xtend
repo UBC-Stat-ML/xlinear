@@ -12,6 +12,7 @@ import xlinear.internals.TablePrettyPrinter
 import org.apache.commons.math3.exception.NotStrictlyPositiveException
 import org.apache.commons.math3.exception.OutOfRangeException
 import org.apache.commons.math3.exception.util.LocalizedFormats
+import java.util.stream.Stream
 
 /*
  * Static utilities, which, in contrast to those in MatrixOperations, 
@@ -185,17 +186,6 @@ class StaticUtils {
         throw denseOrSparseException
     }
   }
-  
-  //// Norms
-
-// TODO: should do that with the stream framework  
-//  static def double norm(Matrix matrix) {
-//    val double[] sum = #[0.0]
-//    visitSkippingSomeZeros(matrix) [int row, int col, double value |
-//      sum.set(0, sum.get(0) + value * value)
-//    ]
-//    return Math.sqrt(sum.get(0))
-//  }
   
   //// Below are support methods for +,-,*
   

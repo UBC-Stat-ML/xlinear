@@ -2,6 +2,8 @@ package xlinear
 
 import xlinear.internals.MatrixVisitorViewOnly
 import xlinear.internals.MatrixVisitorEditInPlace
+import java.util.stream.DoubleStream
+import java.util.stream.IntStream
 
 interface DenseMatrix extends Matrix {
     
@@ -28,6 +30,16 @@ interface DenseMatrix extends Matrix {
       return this.get(col, row)
     ]
     return result
+  }
+  
+  override DoubleStream nonZeroEntries() {
+    val DoubleStream result = 
+      if (isVector) {
+        IntStream.range(0, nEntries).mapToDouble[int entry | this.get(entry)]
+      } else {
+        IntStream.range(0, nRows).mapToObj[int row | this.row(row)].flatMapToDouble[Matrix rowMatrix | rowMatrix.nonZeroEntries()]
+      }
+    return result.filter[double entry | entry != 0.0]
   }
   
   //// scalar * 

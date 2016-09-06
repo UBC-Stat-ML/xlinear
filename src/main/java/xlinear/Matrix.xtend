@@ -1,6 +1,6 @@
 package xlinear
 
-
+import java.util.stream.DoubleStream
 
 /**
  * Note: it is not recommended that the user implements this interface
@@ -37,6 +37,8 @@ interface Matrix {
   def double get(int row, int col)
   def void set(int row, int col, double v)
   
+  def DoubleStream nonZeroEntries()
+  
   /**
    * If this matrix is a vector (either n by 1, or 1 by n),
    * return the value at given index, otherwise, throw 
@@ -49,6 +51,15 @@ interface Matrix {
       return get(0, index)
     else
       return get(index, 0)
+  }
+  
+  def void set(int index, double value) {
+    if (!isVector()) 
+      throw StaticUtils::notAVectorException
+    if (nRows() == 1)
+      set(0, index, value)
+    else
+      set(index, 0, value)
   }
   
   def boolean isVector() {

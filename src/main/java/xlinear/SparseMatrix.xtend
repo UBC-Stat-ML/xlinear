@@ -2,6 +2,9 @@ package xlinear
 
 import xlinear.internals.MatrixVisitorViewOnly
 import xlinear.internals.MatrixVisitorEditInPlace
+import java.util.stream.DoubleStream
+import java.util.List
+import java.util.ArrayList
 
 interface SparseMatrix extends Matrix {
     
@@ -25,6 +28,15 @@ interface SparseMatrix extends Matrix {
    */
   override cholesky() {
     return StaticUtils::convertToColtSparseMatrix(this).cholesky()
+  }
+  
+  override DoubleStream nonZeroEntries() {
+    // TODO: memory efficiency can be improved by factor 2 here
+    val List<Double> values = new ArrayList
+    visitNonZeros[int row, int col, double value |
+      values.add(value)
+    ]
+    return values.stream().mapToDouble[doubleValue]
   }
   
   override SparseMatrix transpose() {
