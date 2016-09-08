@@ -1,5 +1,7 @@
 package xlinear
 
+import xlinear.internals.JavaUtils
+
 class MatrixExtensions {
   
   //// Creating matrices by copying
@@ -21,6 +23,18 @@ class MatrixExtensions {
     }
   }
   
+  def static DenseMatrix denseCopy(Matrix matrix) {
+    val DenseMatrix result = MatrixOperations::dense(matrix.nRows, matrix.nCols)
+    result += matrix
+    return result
+  }
+  
+  def static SparseMatrix sparseCopy(Matrix matrix) {
+    val SparseMatrix result = MatrixOperations::sparse(matrix.nRows, matrix.nCols)
+    result += matrix
+    return result
+  }
+  
   
   //// Norms, etc
   
@@ -32,6 +46,13 @@ class MatrixExtensions {
   def static double norm(Matrix m) {
     val double sumOfSqrs = m.nonZeroEntries().map[double value | value * value].sum()
     return Math.sqrt(sumOfSqrs)
+  }
+  
+    
+  //// Conversion into other representation
+  
+  def static double[][] toArray(Matrix m) {
+    return JavaUtils::toArray(m)
   }
   
   

@@ -40,7 +40,7 @@ task wrapper(type: Wrapper) {
 uploadArchives {
   repositories.mavenDeployer {
     repository(url: "file:///${System.properties['user.home']}/artifacts/")
-    pom.version = "1.0.5"
+    pom.version = "1.0.6"
     pom.artifactId = "xlinear"
     pom.groupId = "ca.ubc.stat"
   }

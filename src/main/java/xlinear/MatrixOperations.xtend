@@ -54,12 +54,6 @@ class MatrixOperations {
     StaticUtils::createDenseMatrixByCopyingArrayContents(data)
   }
 
-  def static DenseMatrix denseCopy(Matrix matrix) {
-    val DenseMatrix result = dense(matrix.nRows, matrix.nCols)
-    result += matrix
-    return result
-  }
-  
   def static SparseMatrix sparseCopy(double[][] data) {
     StaticUtils::createSparseMatrixByCopyingArrayContents(data)
   }
@@ -67,20 +61,6 @@ class MatrixOperations {
   def static SparseMatrix sparseCopy(double[] data) {
     StaticUtils::createSparseMatrixByCopyingArrayContents(data)
   }
-  
-  def static SparseMatrix sparseCopy(Matrix matrix) {
-    val SparseMatrix result = sparse(matrix.nRows, matrix.nCols)
-    result += matrix
-    return result
-  }
-  
-  
-  //// Conversion into other representation
-  
-  def static double[][] toArray(Matrix m) {
-    return JavaUtils::toArray(m)
-  }
-    
   
   private new() {}
 }
