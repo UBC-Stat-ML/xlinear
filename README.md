@@ -65,12 +65,14 @@ To use xlinear in a Java file, add the following import statement:
 
 ```java
 import static xlinear.MatrixOperations.*;
+import static xlinear.MatrixExtensions.*;
 ```
 
 and to use xlinear in an Xtend file, add the following import statement:
 
 ```Xtend
-import static extension xlinear.MatrixOperations.*
+import static extension xlinear.MatrixExtensions.*
+import static xlinear.MatrixOperations.*
 ```
 
 ### Basic usage

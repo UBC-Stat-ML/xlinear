@@ -1,6 +1,7 @@
 package xlinear
 
-import static extension xlinear.MatrixOperations.*
+import static extension xlinear.MatrixExtensions.*
+import static xlinear.MatrixOperations.*
 
 import static xlinear.TestSupport.*
 

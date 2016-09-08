@@ -1,7 +1,8 @@
 package xlinear
 
 import org.junit.Test
-import static extension xlinear.MatrixOperations.*
+import static extension xlinear.MatrixExtensions.*
+import static xlinear.MatrixOperations.*
 import org.junit.Assert
 
 class TestStream {

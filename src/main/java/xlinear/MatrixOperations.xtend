@@ -4,7 +4,6 @@ import xlinear.DenseMatrix
 import xlinear.SparseMatrix
 import xlinear.StaticUtils
 import xlinear.internals.JavaUtils
-import java.util.stream.DoubleStream
 
 class MatrixOperations {
   
@@ -36,25 +35,6 @@ class MatrixOperations {
     StaticUtils::identity(size)
   }
   
-  
-  //// Creating matrices by copying
-  
-  def static SparseMatrix copy(SparseMatrix model) {
-    StaticUtils::copy(model)
-  }
-  
-  def static DenseMatrix copy(DenseMatrix model) {
-    StaticUtils::copy(model)
-  }
-  
-  def static Matrix copy(Matrix model) {
-    switch model {
-      SparseMatrix : copy(model)
-      DenseMatrix  : copy(model)
-      default :
-        throw StaticUtils::denseOrSparseException
-    }
-  }
   
   /*
    * Design note: we avoid copy(double [][] data) in a dispatch method 
@@ -101,74 +81,6 @@ class MatrixOperations {
     return JavaUtils::toArray(m)
   }
     
-  
-  //// Norms, etc
-  
-  def static double sum(Matrix m) {
-    m.nonZeroEntries().sum()
-  }
-  
-  
-  def static double norm(Matrix m) {
-    val double sumOfSqrs = m.nonZeroEntries().map[double value | value * value].sum()
-    return Math.sqrt(sumOfSqrs)
-  }
-  
-
-
-
-//  //// Matrix inversion
-//  
-//  // NB: do not put in interface since e.g. this would not make sense for non-square matrices
-//  def static DenseMatrix inv(DenseMatrix m) {
-//    matrix(new LUDecomposition(m.implementation).getSolver().getInverse())
-//  }
-//  
-//  
-//  //// Dimensionality shortcuts
-//  
-//  def static boolean isColumnVector(Matrix m) {
-//    m.nCols == 1 
-//  }
-//  
-//  def static boolean isRowVector(Matrix m) {
-//    m.nRows == 1
-//  }
-//  
-//  
-//  //// Dot product 
-//  
-//  def static dispatch double dot(Matrix vector1, Matrix vector2) {
-//    throw new UnsupportedOperationException
-//  } 
-//  
-//  def static dispatch double dot(DenseMatrix vector1, DenseMatrix vector2) {
-//    var sum = 0.0
-//         if (isColumnVector(vector1) && isColumnVector(vector2) && vector1.nRows == vector2.nRows) for (var i = 0; i < vector1.nRows; i++) sum += vector1.implementation.getEntry(i, 0) * vector2.implementation.getEntry(i, 0)
-//    else if (isRowVector   (vector1) && isRowVector   (vector2) && vector1.nCols == vector2.nCols) for (var i = 0; i < vector1.nCols; i++) sum += vector1.implementation.getEntry(0, i) * vector2.implementation.getEntry(0, i)
-//    else throw new RuntimeException() // TODO: better exception
-//    return sum 
-//  }
-  
-  
-  //////// Rest of the file defines +, -, *, +=, -=, *= 
-
-
-  
-  //// Matrix scaling
-  
-  def static DenseMatrix *(Number scalar, DenseMatrix m) {
-    m.mul(scalar)
-  }
-  
-  def static SparseMatrix *(Number scalar, SparseMatrix m) {
-    m.mul(scalar)
-  }
-  
-  def static Matrix *(Number scalar, Matrix m) {
-    m.mul(scalar)
-  }
-
   
   private new() {}
 }
