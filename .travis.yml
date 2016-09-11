@@ -1,5 +1,6 @@
 language: java
 script:
-   - gradle check -i
+   - ./gradlew check -i --stacktrace
 jdk:
   - oraclejdk8
+install: ./gradlew assemble -i --stacktrace
