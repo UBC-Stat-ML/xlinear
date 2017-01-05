@@ -76,6 +76,10 @@ interface Matrix {
   def Matrix *(Number n)
   def Matrix mul(Number n)
   
+  def Matrix /(Number n) {
+    return mul(1.0/n)
+  }
+  
   
   //// scalar *=
   

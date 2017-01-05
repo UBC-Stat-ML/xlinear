@@ -3,7 +3,8 @@ package xlinear
 import xlinear.DenseMatrix
 import xlinear.SparseMatrix
 import xlinear.StaticUtils
-import xlinear.internals.JavaUtils
+import java.util.Random
+import org.jblas.DoubleMatrix
 
 class MatrixOperations {
   
@@ -53,6 +54,14 @@ class MatrixOperations {
   def static DenseMatrix denseCopy(double[] data) {
     StaticUtils::createDenseMatrixByCopyingArrayContents(data)
   }
+  
+  def static DenseMatrix denseCopy(DoubleMatrix jblasMatrix) {
+    val DenseMatrix result = dense(jblasMatrix.rows, jblasMatrix.columns);
+    result.editInPlace[int row, int col, double zero |
+      jblasMatrix.get(row, col)      
+    ]
+    return result
+  }
 
   def static SparseMatrix sparseCopy(double[][] data) {
     StaticUtils::createSparseMatrixByCopyingArrayContents(data)
@@ -60,6 +69,17 @@ class MatrixOperations {
   
   def static SparseMatrix sparseCopy(double[] data) {
     StaticUtils::createSparseMatrixByCopyingArrayContents(data)
+  }
+  
+  
+  //// random vectors
+  
+  def static DenseMatrix standardNormalVector(Random random, int dim) {
+    val DenseMatrix result = dense(dim)
+    for (var int i = 0; i < dim; i++) {
+      result.set(i, random.nextGaussian)
+    }
+    return result
   }
   
   private new() {}

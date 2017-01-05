@@ -49,10 +49,14 @@ class MatrixExtensions {
   }
   
     
-  //// Conversion into other representation
+  //// Conversion into other representations
   
   def static double[][] toArray(Matrix m) {
     return JavaUtils::toArray(m)
+  }
+  
+  def static double[] vectorToArray(Matrix m) {
+    return JavaUtils::vectorToArray(m);
   }
   
   
@@ -69,7 +73,7 @@ class MatrixExtensions {
   def static Matrix *(Number scalar, Matrix m) {
     m.mul(scalar)
   }
-  
+
   
   //// Dot product 
   

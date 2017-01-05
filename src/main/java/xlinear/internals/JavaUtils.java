@@ -19,4 +19,12 @@ public class JavaUtils {
     }
     return result;
   }
+  
+  public static double[] vectorToArray(Matrix m) {
+    double [] result = new double[m.nEntries()];
+    for (int i = 0; i < m.nEntries(); i++) {
+      result[i] = m.get(i);
+    }
+    return result;
+  }
 }
