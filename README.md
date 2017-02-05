@@ -114,6 +114,8 @@ System.out.println(prod);
 // 0 |   2.00000  0.00000  0.00000
 // 1 |   0.00000  0.00000  0.00000
 // 2 |   0.00000  0.00000  0.00000
+
+// DenseMatrix inverse = prod.inverse(); // throw exception as it is not invertible
 ```
 
 Sparsity is correctly inferred using these rules:
@@ -152,6 +154,7 @@ DenseMatrix  vector   = dense(100);          // creates dense 100 x 1 initialize
 SparseMatrix spVector = sparse(100_000);     // creates sparse 100k x 1 vector init at 0
 
 SparseMatrix identity = identity(100_000);   // creates sparse 100k x 100k identity matrix
+DenseMatrix  ones     = ones(10,2);          // creates a 10 x 2, all entries set to 1
 
 DenseMatrix fromArr   = denseCopy(new double[][]{{1.0, 2.0},{5.4, 6.1}});
                                              // creates a matrix by copying array
