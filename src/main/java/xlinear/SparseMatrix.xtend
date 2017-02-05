@@ -29,6 +29,12 @@ interface SparseMatrix extends Matrix {
   override cholesky() {
     return StaticUtils::convertToColtSparseMatrix(this).cholesky()
   }
+
+  override inverse() {
+    throw new UnsupportedOperationException(
+      "Inverting a sparse matrix does not exploit sparsity.\n" +
+      "Copy to dense matrix if this is really what you intend to do.")
+  }
   
   override DoubleStream nonZeroEntries() {
     // TODO: memory efficiency can be improved by factor 2 here

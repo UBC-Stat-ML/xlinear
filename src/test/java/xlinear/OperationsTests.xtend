@@ -146,6 +146,12 @@ class OperationsTests {
     assertMatch(scaleByScaleInPlace(denses1.provide(dataA), 2), a2)
     assertMatch(scaleByScaleInPlace(sparses1.provide(dataA), 2), a2)
     
+    
+    //// /= scalar
+    
+    assertMatch(scaleByDivInPlace(denses1.provide(dataA), 2), aOver2)
+    assertMatch(scaleByDivInPlace(sparses1.provide(dataA), 2), aOver2)
+    
   }
   
   @Test
@@ -247,6 +253,11 @@ class OperationsTests {
   
   def static Matrix scaleByScaleInPlace(Matrix m1, double value) {
     m1 *= value
+    return m1
+  }
+  
+    def static Matrix scaleByDivInPlace(Matrix m1, double value) {
+    m1 /= value
     return m1
   }
   

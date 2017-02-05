@@ -29,6 +29,7 @@ class TestData {
   val public static double[][] diff = new Array2DRowRealMatrix(dataA).subtract(new Array2DRowRealMatrix(dataB)).dataRef
   val public static double[][] a2 = new Array2DRowRealMatrix(dataA).scalarMultiply(2.0).data
   val public static double[][] prod = new Array2DRowRealMatrix(dataC).multiply(new Array2DRowRealMatrix(dataD)).dataRef
+  val public static double[][] aOver2 = new Array2DRowRealMatrix(dataA).scalarMultiply(0.5).data
   
   val public static double[][] smallPositiveDefiniteExample = #[
     #[ 2, -1,   0],

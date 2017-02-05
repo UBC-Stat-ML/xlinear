@@ -24,6 +24,10 @@ interface DenseMatrix extends Matrix {
     return StaticUtils::convertToCommonsDenseMatrix(this).cholesky()
   }
   
+  override DenseMatrix inverse() {
+    return StaticUtils::convertToCommonsDenseMatrix(this).inverse()
+  }
+  
   override DenseMatrix transpose() {
     val DenseMatrix result = createEmpty(nCols, nRows)
     result.editInPlace[int row, int col, double value |

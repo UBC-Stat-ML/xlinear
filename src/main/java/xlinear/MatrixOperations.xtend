@@ -36,6 +36,16 @@ class MatrixOperations {
     StaticUtils::identity(size)
   }
   
+  def static DenseMatrix ones(int rows, int cols) {
+    val DenseMatrix result = dense(rows, cols)
+    result.editInPlace[1.0]
+    return result
+  }
+  
+  def static DenseMatrix ones(int size) {
+    ones(size, 1)
+  }
+  
   
   /*
    * Design note: we avoid copy(double [][] data) in a dispatch method 

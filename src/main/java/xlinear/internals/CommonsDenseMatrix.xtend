@@ -8,6 +8,7 @@ import xlinear.StaticUtils
 import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
 import xlinear.CholeskyDecomposition
 import org.apache.commons.math3.linear.RealMatrix
+import org.apache.commons.math3.linear.LUDecomposition
 
 @Data class CommonsDenseMatrix implements DenseMatrix {
   
@@ -52,6 +53,13 @@ import org.apache.commons.math3.linear.RealMatrix
       new org.apache.commons.math3.linear.CholeskyDecomposition(implementation)
     val CommonsDenseMatrix L = new CommonsDenseMatrix(chol.l)
     return new CholeskyDecomposition(L.readOnlyView);
+  }
+  
+  override CommonsDenseMatrix inverse() {
+    // TODO: catch exceptions to harmonize them with Dense
+    // TODO: attempt to use JEigen/JBlas if matrix is large
+    val inverted = new LUDecomposition(implementation).getSolver().getInverse()
+    return new CommonsDenseMatrix(inverted)
   }
   
   override CommonsDenseMatrix createEmpty(int nRows, int nCols) {

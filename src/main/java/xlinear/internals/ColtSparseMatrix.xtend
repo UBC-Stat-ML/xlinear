@@ -12,7 +12,7 @@ import xlinear.CholeskyDecomposition
  * Design decision: for first version, use Colt instead of Math Commons sparse matrices,
  * because Math Commons has the artificial restriction that nRows * nCols has to 
  * be smaller than Integer.MAX_VALUE (no matter how sparse it is).
- * Colt can hold up to Integer.LONG_VALUE (but this is poorly documented), which 
+ * Colt can hold up to Long.LONG_VALUE (but this is poorly documented), which 
  * should be more than enough; for more would need more than int's for rows and cols.
  */
 @Data class ColtSparseMatrix implements SparseMatrix {
@@ -109,31 +109,56 @@ import xlinear.CholeskyDecomposition
     }
     
     override void visitNonZeros(MatrixVisitorViewOnly visitor) {
-      root().visitNonZeros[int row, int col, double value |
-        if (row >= row0Incl && row < row1Excl &&
-            col >= col0Incl && col < col1Excl)
-          visitor.visit(
-            rowRoot2Slice(row), 
-            colRoot2Slice(col), 
-            value
-          )
-      ]
+      if (nRows * nCols < root().implementation.cardinality) {
+        // optimization for small slices
+        for (var int row = 0; row < nRows; row++) {
+          for (var int col = 0; col < nCols; col++) {
+            val value = get(row, col)
+            if (value != 0.0) {
+              visitor.visit(row, col, value)
+            }
+          }
+        }
+      } else {
+        root().visitNonZeros[int row, int col, double value |
+          if (row >= row0Incl && row < row1Excl &&
+              col >= col0Incl && col < col1Excl)
+            visitor.visit(
+              rowRoot2Slice(row), 
+              colRoot2Slice(col), 
+              value
+            )
+        ] 
+      }
     }
     
     override void editNonZerosInPlace(MatrixVisitorEditInPlace visitor) {
-      if (readOnly)
+      if (readOnly) {
         throw new UnsupportedOperationException
-      root().editNonZerosInPlace[int row, int col, double value |
-        if (row >= row0Incl && row < row1Excl &&
-            col >= col0Incl && col < col1Excl)
-          return visitor.editInPlace(
-            rowRoot2Slice(row), 
-            colRoot2Slice(col), 
-            value
-          )
-        else
-          return value
-      ]
+      }
+      if (nRows * nCols < root().implementation.cardinality) {
+        // optimization for small slices
+        for (var int row = 0; row < nRows; row++) {
+          for (var int col = 0; col < nCols; col++) {
+            val value = get(row, col)
+            if (value != 0.0) {
+              set(row, col, visitor.editInPlace(row, col, value))
+            }
+          }
+        }
+      } else {
+        root().editNonZerosInPlace[int row, int col, double value |
+          if (row >= row0Incl && row < row1Excl &&
+              col >= col0Incl && col < col1Excl)
+            return visitor.editInPlace(
+              rowRoot2Slice(row), 
+              colRoot2Slice(col), 
+              value
+            )
+          else
+            return value
+        ]
+      }
     }
     
     override SparseMatrix createEmpty(int nRows, int nCols) {

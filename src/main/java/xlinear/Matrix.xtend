@@ -70,13 +70,15 @@ interface Matrix {
   
   def CholeskyDecomposition cholesky()
   def Matrix transpose()
+  def Matrix inverse()
   
   //// scalar *
   
   def Matrix *(Number n)
   def Matrix mul(Number n)
   
-  def Matrix /(Number n) {
+  def Matrix /(Number n) { div(n) }
+  def Matrix div(Number n) {
     return mul(1.0/n)
   }
   
@@ -85,6 +87,11 @@ interface Matrix {
   
   def void *=(Number n) { mulInPlace(n) }
   def void mulInPlace(Number n)
+  
+  def void /=(Number n) { divInPlace(n) }
+  def void divInPlace(Number n) {
+    mulInPlace(1.0/n)
+  }
   
   //// matrix *
   
