@@ -46,11 +46,15 @@ interface DenseMatrix extends Matrix {
     return result.filter[double entry | entry != 0.0]
   }
   
-  //// scalar * 
+  //// scalar * or /
   
   override DenseMatrix *(Number n)   { return mul(n) }
   override DenseMatrix mul(Number n) {
     return StaticUtils::scale(this, n.doubleValue)
+  }
+  override DenseMatrix /(Number n) { return div(n) }
+  override DenseMatrix div(Number n) {
+    return mul(1.0/n)
   }
   
   //// scalar *=

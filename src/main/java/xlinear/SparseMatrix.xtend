@@ -53,11 +53,16 @@ interface SparseMatrix extends Matrix {
     return result
   }
   
-  //// scalar *
+  //// scalar * or /
   
   override SparseMatrix *(Number n)   { return mul(n) }
   override SparseMatrix mul(Number n) {
     return StaticUtils::scale(this, n.doubleValue)
+  }
+  
+  override SparseMatrix /(Number n) { return div(n) }
+  override SparseMatrix div(Number n) {
+    return mul(1.0/n)
   }
   
   //// scalar *=

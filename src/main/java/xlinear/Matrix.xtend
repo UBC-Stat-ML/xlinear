@@ -72,7 +72,7 @@ interface Matrix {
   def Matrix transpose()
   def Matrix inverse()
   
-  //// scalar *
+  //// scalar * or /
   
   def Matrix *(Number n)
   def Matrix mul(Number n)

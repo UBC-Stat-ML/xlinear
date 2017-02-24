@@ -106,6 +106,16 @@ class MatrixExtensions {
   }
   
   
+  // increment an entry
+  
+  def static void increment(Matrix m, int row, int col, double value) {
+    m.set(row, col, m.get(row, col) + value)
+  }
+  
+  def static void increment(Matrix m, int entry, double value) {
+    m.set(entry, m.get(entry) + value)
+  }
+  
   
   private new() {}
 }
