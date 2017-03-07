@@ -168,6 +168,19 @@ DenseMatrix denseVec  = denseCopy(new double[]{234.3, 23.4, 0.0});
 // sparseCopy(..) works in the same way as the previous three
 ```
 
+Various common operations
+-------------------------
+
+```java
+// Dot product
+dot(sparse(100_000), sparse(100_000)); // In Xtend, also allowed: sparse(100_000).dot(sparse(100_000))
+double [][] converted = toArray(dense(10,10)); // In Xtend, also allowed: dense(10,10).toArray
+double [] converted = toArray(sparse(10));
+double euclideanNorm = norm(ones(10));
+double sum = sum(identity(10));
+```
+
+
 Slice and views
 ---------------
 
@@ -248,4 +261,7 @@ System.out.println(L.mul(L.transpose()));
 // 0 |    2.00000  -1.00000   0.00000
 // 1 |   -1.00000   2.00000  -1.00000
 // 2 |    0.00000  -1.00000   2.00000
+
+// Find log | determinant | from Cholesky:
+System.out.println(posDef.cholesky().logDet());
 ```
