@@ -9,6 +9,7 @@ import org.apache.commons.math3.linear.RealMatrixPreservingVisitor
 import xlinear.CholeskyDecomposition
 import org.apache.commons.math3.linear.RealMatrix
 import org.apache.commons.math3.linear.LUDecomposition
+import org.apache.commons.math3.exception.MathIllegalNumberException
 
 @Data class CommonsDenseMatrix implements DenseMatrix {
   
@@ -47,12 +48,16 @@ import org.apache.commons.math3.linear.LUDecomposition
   }
   
   override CholeskyDecomposition cholesky() {
-    // TODO: catch exceptions to harmonize them with Dense
+    StaticUtils::checkMatrixIsSquare(this)
     // TODO: attempt to use JEigen if matrix is large
-    val chol = 
-      new org.apache.commons.math3.linear.CholeskyDecomposition(implementation)
-    val CommonsDenseMatrix L = new CommonsDenseMatrix(chol.l)
-    return new CholeskyDecomposition(L.readOnlyView);
+    try {
+      val chol = 
+        new org.apache.commons.math3.linear.CholeskyDecomposition(implementation)
+      val CommonsDenseMatrix L = new CommonsDenseMatrix(chol.l)
+      return new CholeskyDecomposition(L.readOnlyView);
+    } catch (MathIllegalNumberException mine) {
+      throw StaticUtils::notSymmetricPosDef
+    }
   }
   
   override CommonsDenseMatrix inverse() {

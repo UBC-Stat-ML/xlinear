@@ -12,7 +12,6 @@ import xlinear.internals.TablePrettyPrinter
 import org.apache.commons.math3.exception.NotStrictlyPositiveException
 import org.apache.commons.math3.exception.OutOfRangeException
 import org.apache.commons.math3.exception.util.LocalizedFormats
-import java.util.stream.Stream
 
 /*
  * Static utilities, which, in contrast to those in MatrixOperations, 
@@ -361,6 +360,11 @@ class StaticUtils {
       throw new DimensionMismatchException(matrix1.nCols, matrix2.nRows)
   }
   
+  def static checkMatrixIsSquare(Matrix matrix) {
+    if (matrix.nCols != matrix.nRows)
+      throw notSquare
+  }
+  
   def private static checkSizesEqual(Matrix matrix1, Matrix matrix2) {
     if (matrix1.nRows != matrix2.nRows || 
         matrix1.nCols != matrix2.nCols)
@@ -380,6 +384,8 @@ class StaticUtils {
   
   val public  static notAVectorException = new RuntimeException("This operation is only supported on a 1 by n or n by 1 matrix.")
   val public  static notAScalarException = new RuntimeException("This operation is only supported on a 1 by 1 matrix.")
+  val public  static notSymmetricPosDef = new RuntimeException("This operation is only supported on a symmetric positive definite matrix.")
+  val public  static notSquare = new RuntimeException("This operation is only supported on a square matrix.")
   val package static denseOrSparseException = new RuntimeException("Either a SparseMatrix or DenseMatrix required.")
   val package static notBothSparseAndDense = new RuntimeException("A matrix should not be both a SparseMatrix and a DenseMatrix")
 }

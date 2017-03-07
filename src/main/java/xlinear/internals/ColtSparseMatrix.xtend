@@ -56,15 +56,19 @@ import xlinear.CholeskyDecomposition
   }
   
   override CholeskyDecomposition cholesky() {
-    // TODO: catch exceptions to harmonize them with Dense
+    StaticUtils::checkMatrixIsSquare(this) 
     // TODO: attempt to use JEigen if matrix is large
     switch implementation {
       SparseDoubleMatrix2D : {
-        val SparseDoubleCholeskyDecomposition chol = 
-          new SparseDoubleCholeskyDecomposition(
-              implementation.getColumnCompressed(false), 0)
-        val SparseMatrix L = new ColtSparseMatrix(chol.l)
-        return new CholeskyDecomposition(L.readOnlyView)
+        try {
+          val SparseDoubleCholeskyDecomposition chol = 
+            new SparseDoubleCholeskyDecomposition(
+                implementation.getColumnCompressed(false), 0)
+          val SparseMatrix L = new ColtSparseMatrix(chol.l)
+          return new CholeskyDecomposition(L.readOnlyView)
+        } catch (IllegalArgumentException iae) {
+          throw StaticUtils::notSymmetricPosDef
+        }
       }
       default :
         return StaticUtils::convertToColtSparseMatrix(this).cholesky()

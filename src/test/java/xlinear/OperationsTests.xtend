@@ -206,6 +206,31 @@ class OperationsTests {
     
   }
   
+  @Test
+  def void testChol() {
+    val SparseMatrix _posDef = sparseCopy(TestData.smallPositiveDefiniteExample);
+    val posDefMatrices = #[_posDef, denseCopy(_posDef)]
+    
+    for (posDef : posDefMatrices) {
+      val Matrix L = posDef.cholesky().L
+      assertMatch(L * L.transpose, posDef, 1e-10)
+    }
+    
+    val SparseMatrix _negDef = sparseCopy(#[#[-1.0]])
+    val negDefs = #[_negDef, denseCopy(_negDef)]
+    
+    for (negDef : negDefs) {
+      assertThrownExceptionMatches([negDef.cholesky], StaticUtils::notSymmetricPosDef)
+    }
+    
+    val SparseMatrix _notSq = sparseCopy(#[#[1.0, 2.0]])
+    val notSqs = #[_notSq, denseCopy(_notSq)]
+    
+    for (notSq : notSqs) {
+      assertThrownExceptionMatches([notSq.cholesky], StaticUtils::notSquare)
+    }
+  }
+  
   def static void testEfficient(Matrix matrix1, Matrix matrix2) {
     matrix1 += matrix2
     matrix1 *= 2
