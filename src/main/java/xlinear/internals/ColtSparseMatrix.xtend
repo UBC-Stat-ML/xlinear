@@ -7,6 +7,10 @@ import xlinear.StaticUtils
 import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleCholeskyDecomposition
 import cern.colt.matrix.tdouble.DoubleMatrix2D
 import xlinear.CholeskyDecomposition
+import xlinear.CholeskyDecomposition.Solver
+import xlinear.Matrix
+import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D
+import xlinear.MatrixOperations
 
 /*
  * Design decision: for first version, use Colt instead of Math Commons sparse matrices,
@@ -65,7 +69,7 @@ import xlinear.CholeskyDecomposition
             new SparseDoubleCholeskyDecomposition(
                 implementation.getColumnCompressed(false), 0)
           val SparseMatrix L = new ColtSparseMatrix(chol.l)
-          return new CholeskyDecomposition(L.readOnlyView)
+          return new CholeskyDecomposition(L.readOnlyView, new SparseSolver(chol))
         } catch (IllegalArgumentException iae) {
           throw StaticUtils::notSymmetricPosDef
         }
@@ -73,6 +77,22 @@ import xlinear.CholeskyDecomposition
       default :
         return StaticUtils::convertToColtSparseMatrix(this).cholesky()
     }
+  }
+  
+  @Data
+  private static class SparseSolver implements Solver {
+    val SparseDoubleCholeskyDecomposition implementation   
+    override solve(Matrix b) {
+      if (!b.isVector()) 
+        throw StaticUtils::notAVectorException
+      val DenseDoubleMatrix1D copy = new DenseDoubleMatrix1D(b.nEntries)
+      for (var int i = 0; i < b.nEntries; i++) {
+        copy.set(i, b.get(i))
+      }
+      implementation.solve(copy)
+      return MatrixOperations::denseCopy(copy.toArray)
+    }
+    
   }
   
   override int nRows() {

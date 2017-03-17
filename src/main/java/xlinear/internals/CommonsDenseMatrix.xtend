@@ -10,6 +10,11 @@ import xlinear.CholeskyDecomposition
 import org.apache.commons.math3.linear.RealMatrix
 import org.apache.commons.math3.linear.LUDecomposition
 import org.apache.commons.math3.exception.MathIllegalNumberException
+import xlinear.CholeskyDecomposition.Solver
+import xlinear.Matrix
+import org.apache.commons.math3.linear.ArrayRealVector
+import xlinear.MatrixOperations
+import org.apache.commons.math3.linear.RealVector
 
 @Data class CommonsDenseMatrix implements DenseMatrix {
   
@@ -49,15 +54,31 @@ import org.apache.commons.math3.exception.MathIllegalNumberException
   
   override CholeskyDecomposition cholesky() {
     StaticUtils::checkMatrixIsSquare(this)
-    // TODO: attempt to use JEigen if matrix is large
+    // TODO: attempt to use JEigen or JBlas if matrix is large
     try {
       val chol = 
         new org.apache.commons.math3.linear.CholeskyDecomposition(implementation)
       val CommonsDenseMatrix L = new CommonsDenseMatrix(chol.l)
-      return new CholeskyDecomposition(L.readOnlyView);
+      return new CholeskyDecomposition(L.readOnlyView, new DenseSolver(chol))
     } catch (MathIllegalNumberException mine) {
       throw StaticUtils::notSymmetricPosDef
     }
+  }
+  
+  @Data
+  public static class DenseSolver implements Solver {
+    val org.apache.commons.math3.linear.CholeskyDecomposition implementation
+    override solve(Matrix b) {
+      if (!b.isVector()) 
+        throw StaticUtils::notAVectorException
+      val ArrayRealVector copy = new ArrayRealVector(b.nEntries)
+      for (var int i = 0; i < b.nEntries; i++) {
+        copy.setEntry(i, b.get(i))
+      }
+      val RealVector solution = implementation.solver.solve(copy)
+      return MatrixOperations::denseCopy(solution.toArray)
+    }
+    
   }
   
   override CommonsDenseMatrix inverse() {

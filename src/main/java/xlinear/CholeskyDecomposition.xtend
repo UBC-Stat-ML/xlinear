@@ -9,6 +9,8 @@ import org.eclipse.xtend.lib.annotations.Data
    */
   val public Matrix L
   
+  val public Solver solver
+  
   /**
    * log | determinant |
    */
@@ -19,5 +21,9 @@ import org.eclipse.xtend.lib.annotations.Data
     }
     // *2 because det(precision) = det(L) * det(L^T)
     return 2*sum;
+  }
+  
+  public static interface Solver {
+    def DenseMatrix solve(Matrix b)
   }
 }
