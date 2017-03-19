@@ -1,7 +1,15 @@
 package xlinear
 
 import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtend.lib.annotations.Accessors
 
+/**
+ * A lower triangular matrix L such that M = L * L.transpose 
+ * and utilities for solving systems of the form
+ * M*x = b, or
+ * M*L = b, or
+ * M*L.transpose = b
+ */
 @Data class CholeskyDecomposition {
   
   /**
@@ -9,7 +17,8 @@ import org.eclipse.xtend.lib.annotations.Data
    */
   val public Matrix L
   
-  val public Solver solver
+  @Accessors(NONE)
+  val private Solver solver 
   
   /**
    * log | determinant |
@@ -23,7 +32,35 @@ import org.eclipse.xtend.lib.annotations.Data
     return 2*sum;
   }
   
-  public static interface Solver {
-    def DenseMatrix solve(Matrix b)
+  /**
+   * For given b and M, find x such that 
+   * M * x = b
+   */
+  def DenseMatrix solve(Matrix b) {
+    return solver.solve(b, SolverMode.M)
+  }
+  
+  /**
+   * For given b and L, find x such that 
+   * L * x = b
+   */
+  def DenseMatrix solveWithLCoefficients(Matrix b) {
+    return solver.solve(b, SolverMode.L)
+  }
+  
+    /**
+   * For given b and L, find x such that 
+   * L.transpose * x = b
+   */
+  def DenseMatrix solveWithLtransposeCoefficients(Matrix b) {
+    return solver.solve(b, SolverMode.Lt)
+  }
+  
+  static interface Solver { 
+    def DenseMatrix solve(Matrix b, SolverMode mode)
+  }
+  
+  static enum SolverMode {
+    M, L, Lt
   }
 }

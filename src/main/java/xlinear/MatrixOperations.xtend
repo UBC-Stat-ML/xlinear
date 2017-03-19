@@ -5,6 +5,8 @@ import xlinear.SparseMatrix
 import xlinear.StaticUtils
 import java.util.Random
 import org.jblas.DoubleMatrix
+import org.apache.commons.math3.linear.RealMatrix
+import org.apache.commons.math3.linear.RealVector
 
 class MatrixOperations {
   
@@ -72,6 +74,22 @@ class MatrixOperations {
     ]
     return result
   }
+  
+  def static DenseMatrix denseCopy(RealMatrix commonsMatrix) {
+    val DenseMatrix result = dense(commonsMatrix.rowDimension, commonsMatrix.columnDimension);
+    result.editInPlace[int row, int col, double zero |
+      commonsMatrix.getEntry(row, col)      
+    ]
+    return result
+  }
+  
+  def static DenseMatrix denseCopy(RealVector commonsMatrix) {
+    val DenseMatrix result = dense(commonsMatrix.dimension, 1);
+    result.editInPlace[int row, int col, double zero |
+      commonsMatrix.getEntry(row)      
+    ]
+    return result
+  }
 
   def static SparseMatrix sparseCopy(double[][] data) {
     StaticUtils::createSparseMatrixByCopyingArrayContents(data)
@@ -90,6 +108,28 @@ class MatrixOperations {
       result.set(i, random.nextGaussian)
     }
     return result
+  }
+  
+  def static DenseMatrix sampleStandardNormal(Random random, int dim) {
+    return standardNormalVector(random, dim) 
+  }
+  
+  def static DenseMatrix sampleNormalByCovariance(Random random, Matrix covariance) {
+    return sampleNormalByCovariance(random, covariance.cholesky)
+  }
+  
+  def static DenseMatrix sampleNormalByCovariance(Random random, CholeskyDecomposition covariance) {
+    val Matrix L = covariance.L
+    return L * standardNormalVector(random, L.nRows)
+  }
+  
+  def static DenseMatrix sampleNormalByPrecision(Random random, Matrix precision) {
+    return sampleNormalByPrecision(random, precision.cholesky)
+  }
+  
+  def static DenseMatrix sampleNormalByPrecision(Random random, CholeskyDecomposition precision) {
+    val DenseMatrix b = standardNormalVector(random, precision.L.nRows)
+    return precision.solveWithLtransposeCoefficients(b)
   }
   
   private new() {}

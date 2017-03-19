@@ -4,13 +4,13 @@ import xlinear.SparseMatrix
 import org.eclipse.xtend.lib.annotations.Data
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D
 import xlinear.StaticUtils
-import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleCholeskyDecomposition
 import cern.colt.matrix.tdouble.DoubleMatrix2D
 import xlinear.CholeskyDecomposition
 import xlinear.CholeskyDecomposition.Solver
 import xlinear.Matrix
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D
 import xlinear.MatrixOperations
+import xlinear.CholeskyDecomposition.SolverMode
 
 /*
  * Design decision: for first version, use Colt instead of Math Commons sparse matrices,
@@ -65,8 +65,8 @@ import xlinear.MatrixOperations
     switch implementation {
       SparseDoubleMatrix2D : {
         try {
-          val SparseDoubleCholeskyDecomposition chol = 
-            new SparseDoubleCholeskyDecomposition(
+          val CustomizedColtSparseDoubleCholesky chol = 
+            new CustomizedColtSparseDoubleCholesky(
                 implementation.getColumnCompressed(false), 0)
           val SparseMatrix L = new ColtSparseMatrix(chol.l)
           return new CholeskyDecomposition(L.readOnlyView, new SparseSolver(chol))
@@ -81,15 +81,15 @@ import xlinear.MatrixOperations
   
   @Data
   private static class SparseSolver implements Solver {
-    val SparseDoubleCholeskyDecomposition implementation   
-    override solve(Matrix b) {
+    val CustomizedColtSparseDoubleCholesky implementation   
+    override solve(Matrix b, SolverMode mode) {
       if (!b.isVector()) 
         throw StaticUtils::notAVectorException
       val DenseDoubleMatrix1D copy = new DenseDoubleMatrix1D(b.nEntries)
       for (var int i = 0; i < b.nEntries; i++) {
         copy.set(i, b.get(i))
       }
-      implementation.solve(copy)
+      implementation.solve(copy, mode)
       return MatrixOperations::denseCopy(copy.toArray)
     }
     

@@ -1,6 +1,8 @@
 package xlinear
 
 import xlinear.internals.JavaUtils
+import org.apache.commons.math3.linear.BlockRealMatrix
+import org.apache.commons.math3.linear.ArrayRealVector
 
 class MatrixExtensions {
   
@@ -49,7 +51,7 @@ class MatrixExtensions {
   }
   
     
-  //// Conversion into other representations
+  //// Conversion into other representations (copy)
   
   def static double[][] toArray(Matrix m) {
     return JavaUtils::toArray(m)
@@ -57,6 +59,14 @@ class MatrixExtensions {
   
   def static double[] vectorToArray(Matrix m) {
     return JavaUtils::vectorToArray(m);
+  }
+  
+  def static BlockRealMatrix toCommonsMatrix(Matrix m) {
+    return new BlockRealMatrix(m.toArray)
+  }
+  
+  def static ArrayRealVector toCommonsVector(Matrix m) {
+    return new ArrayRealVector(m.vectorToArray)
   }
   
   

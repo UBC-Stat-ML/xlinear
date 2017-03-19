@@ -264,4 +264,10 @@ System.out.println(L.mul(L.transpose()));
 
 // Find log | determinant | from Cholesky:
 System.out.println(posDef.cholesky().logDet());
+
+// solve A*x = b for x
+DenseMatrix b = ones(3);
+DenseMatrix x = posDef.cholesky().solve(b);
+System.out.println(b);
+System.out.println(A.mul(x));
 ```

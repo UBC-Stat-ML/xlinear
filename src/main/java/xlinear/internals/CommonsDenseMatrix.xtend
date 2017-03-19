@@ -12,9 +12,12 @@ import org.apache.commons.math3.linear.LUDecomposition
 import org.apache.commons.math3.exception.MathIllegalNumberException
 import xlinear.CholeskyDecomposition.Solver
 import xlinear.Matrix
-import org.apache.commons.math3.linear.ArrayRealVector
 import xlinear.MatrixOperations
 import org.apache.commons.math3.linear.RealVector
+import xlinear.CholeskyDecomposition.SolverMode
+import org.apache.commons.math3.linear.DecompositionSolver
+import org.apache.commons.math3.linear.MatrixUtils
+import xlinear.MatrixExtensions
 
 @Data class CommonsDenseMatrix implements DenseMatrix {
   
@@ -59,7 +62,7 @@ import org.apache.commons.math3.linear.RealVector
       val chol = 
         new org.apache.commons.math3.linear.CholeskyDecomposition(implementation)
       val CommonsDenseMatrix L = new CommonsDenseMatrix(chol.l)
-      return new CholeskyDecomposition(L.readOnlyView, new DenseSolver(chol))
+      return new CholeskyDecomposition(L.readOnlyView, new DenseSolver(chol.solver, L))
     } catch (MathIllegalNumberException mine) {
       throw StaticUtils::notSymmetricPosDef
     }
@@ -67,16 +70,28 @@ import org.apache.commons.math3.linear.RealVector
   
   @Data
   public static class DenseSolver implements Solver {
-    val org.apache.commons.math3.linear.CholeskyDecomposition implementation
-    override solve(Matrix b) {
+    val DecompositionSolver implementation
+    val Matrix L
+    override solve(Matrix b, SolverMode mode) {
       if (!b.isVector()) 
         throw StaticUtils::notAVectorException
-      val ArrayRealVector copy = new ArrayRealVector(b.nEntries)
-      for (var int i = 0; i < b.nEntries; i++) {
-        copy.setEntry(i, b.get(i))
-      }
-      val RealVector solution = implementation.solver.solve(copy)
-      return MatrixOperations::denseCopy(solution.toArray)
+      val RealVector solution = 
+        switch mode {
+          case SolverMode.M : implementation.solve(MatrixExtensions::toCommonsVector(b))
+          case SolverMode.L : {
+            val RealVector copy = MatrixExtensions::toCommonsVector(b)
+            MatrixUtils::solveLowerTriangularSystem(MatrixExtensions::toCommonsMatrix(L), copy)
+            copy
+          }
+          case SolverMode.Lt : {
+            val RealVector copy = MatrixExtensions::toCommonsVector(b)
+            MatrixUtils::solveUpperTriangularSystem(MatrixExtensions::toCommonsMatrix(L.transpose), copy) 
+            copy
+          }
+          default :
+            throw new RuntimeException
+        }
+      return MatrixOperations::denseCopy(solution)
     }
     
   }

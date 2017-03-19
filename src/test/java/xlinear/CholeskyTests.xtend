@@ -20,7 +20,13 @@ class CholeskyTests {
     val L = m.cholesky.L
     assertMatch(L * L.transpose, m, 1e-5)
     val b = denseCopy(#[1.3, 3.2, 4.4])
-    val x = m.cholesky.solver.solve(b)
+    val x = m.cholesky.solve(b)
     assertMatch(b, m * x, 1e-5)
+    
+    val x2 = m.cholesky.solveWithLCoefficients(b)
+    assertMatch(b, L * x2, 1e-5)
+    
+    val x3 = m.cholesky.solveWithLtransposeCoefficients(b)
+    assertMatch(b, L.transpose * x3, 1e-5)
   }
 }
