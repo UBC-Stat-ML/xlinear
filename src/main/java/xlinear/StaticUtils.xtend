@@ -382,10 +382,10 @@ class StaticUtils {
     new DimensionMismatchException(Math::max(d1, d2), Math::min(d1, d2))
   }
   
-  val public  static notAVectorException = new RuntimeException("This operation is only supported on a 1 by n or n by 1 matrix.")
-  val public  static notAScalarException = new RuntimeException("This operation is only supported on a 1 by 1 matrix.")
-  val public  static notSymmetricPosDef = new RuntimeException("This operation is only supported on a symmetric positive definite matrix.")
-  val public  static notSquare = new RuntimeException("This operation is only supported on a square matrix.")
-  val package static denseOrSparseException = new RuntimeException("Either a SparseMatrix or DenseMatrix required.")
-  val package static notBothSparseAndDense = new RuntimeException("A matrix should not be both a SparseMatrix and a DenseMatrix")
+  def public static notAVectorException() { new RuntimeException("This operation is only supported on a 1 by n or n by 1 matrix.") }
+  def public static notAScalarException() { new RuntimeException("This operation is only supported on a 1 by 1 matrix.") }
+  def public static notSymmetricPosDef() { new RuntimeException("This operation is only supported on a symmetric positive definite matrix.") }
+  def public static notSquare() { new RuntimeException("This operation is only supported on a square matrix.") }
+  def public static denseOrSparseException() { new RuntimeException("Either a SparseMatrix or DenseMatrix required.") }
+  def public static notBothSparseAndDense() { new RuntimeException("A matrix should not be both a SparseMatrix and a DenseMatrix") }
 }
