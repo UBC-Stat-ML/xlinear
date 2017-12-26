@@ -61,8 +61,8 @@ import xlinear.MatrixExtensions
     try {
       val chol = 
         new org.apache.commons.math3.linear.CholeskyDecomposition(implementation)
-      val CommonsDenseMatrix L = new CommonsDenseMatrix(chol.l)
-      return new CholeskyDecomposition(L.readOnlyView, new DenseSolver(chol.solver, L))
+      val DenseMatrix L = new CommonsDenseMatrix(chol.l).readOnlyView
+      return new CholeskyDecomposition(L, new DenseSolver(chol.solver, L))
     } catch (MathIllegalNumberException mine) {
       throw StaticUtils::notSymmetricPosDef
     }
