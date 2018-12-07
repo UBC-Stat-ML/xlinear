@@ -24,6 +24,10 @@ interface DenseMatrix extends Matrix {
     return StaticUtils::convertToCommonsDenseMatrix(this).cholesky()
   }
   
+  override LUDecomposition lu() {
+    return StaticUtils::convertToCommonsDenseMatrix(this).lu()
+  }
+  
   override DenseMatrix inverse() {
     return StaticUtils::convertToCommonsDenseMatrix(this).inverse()
   }

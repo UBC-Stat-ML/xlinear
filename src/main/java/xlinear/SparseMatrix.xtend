@@ -24,10 +24,18 @@ interface SparseMatrix extends Matrix {
   
   /**
    * Default behavior for views: convert to concrete implementation 
-   * and the compute the Cholesky
+   * and then compute the Cholesky
    */
   override cholesky() {
     return StaticUtils::convertToColtSparseMatrix(this).cholesky()
+  }
+  
+  /**
+   * Default behavior for views: convert to concrete implementation 
+   * and then compute the LU
+   */
+  override lu() {
+    return StaticUtils::convertToColtSparseMatrix(this).lu()
   }
 
   override inverse() {

@@ -69,6 +69,7 @@ interface Matrix {
   def Matrix createEmpty(int nRows, int nCols)
   
   def CholeskyDecomposition cholesky()
+  def LUDecomposition lu()
   def Matrix transpose()
   def Matrix inverse()
   

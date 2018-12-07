@@ -18,7 +18,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
   val public Matrix L
   
   @Accessors(NONE)
-  val private Solver solver 
+  val private CholeskySolver solver 
   
   /**
    * log | determinant |
@@ -37,6 +37,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
    * M * x = b
    */
   def DenseMatrix solve(Matrix b) {
+    StaticUtils::checkMatrixMultiplicationDimensionsMatch(L, b) 
     return solver.solve(b, SolverMode.M)
   }
   
@@ -45,6 +46,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
    * L * x = b
    */
   def DenseMatrix solveWithLCoefficients(Matrix b) {
+    StaticUtils::checkMatrixMultiplicationDimensionsMatch(L, b) 
     return solver.solve(b, SolverMode.L)
   }
   
@@ -53,10 +55,11 @@ import org.eclipse.xtend.lib.annotations.Accessors
    * L.transpose * x = b
    */
   def DenseMatrix solveWithLtransposeCoefficients(Matrix b) {
+    StaticUtils::checkMatrixMultiplicationDimensionsMatch(L, b) 
     return solver.solve(b, SolverMode.Lt)
   }
   
-  static interface Solver { 
+  static interface CholeskySolver { 
     def DenseMatrix solve(Matrix b, SolverMode mode)
   }
   

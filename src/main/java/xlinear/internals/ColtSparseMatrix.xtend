@@ -6,11 +6,15 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D
 import xlinear.StaticUtils
 import cern.colt.matrix.tdouble.DoubleMatrix2D
 import xlinear.CholeskyDecomposition
-import xlinear.CholeskyDecomposition.Solver
 import xlinear.Matrix
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D
 import xlinear.MatrixOperations
 import xlinear.CholeskyDecomposition.SolverMode
+import xlinear.LUDecomposition
+import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition
+import xlinear.CholeskyDecomposition.CholeskySolver
+import xlinear.LUDecomposition.LUSolver
+import cern.colt.matrix.tdouble.algo.decomposition.CSparseDoubleLUDecomposition
 
 /*
  * Design decision: for first version, use Colt instead of Math Commons sparse matrices,
@@ -69,7 +73,7 @@ import xlinear.CholeskyDecomposition.SolverMode
             new CustomizedColtSparseDoubleCholesky(
                 implementation.getColumnCompressed(false), 0)
           val SparseMatrix L = new ColtSparseMatrix(chol.l)
-          return new CholeskyDecomposition(L.readOnlyView, new SparseSolver(chol))
+          return new CholeskyDecomposition(L.readOnlyView, new SparseCholeskySolver(chol))
         } catch (IllegalArgumentException iae) {
           throw StaticUtils::notSymmetricPosDef
         }
@@ -79,8 +83,25 @@ import xlinear.CholeskyDecomposition.SolverMode
     }
   }
   
+  override LUDecomposition lu() {
+    StaticUtils::checkMatrixIsSquare(this) 
+    // TODO: attempt to use JEigen if matrix is large
+    switch implementation {
+      SparseDoubleMatrix2D : {
+        val SparseDoubleLUDecomposition lu = 
+          new CSparseDoubleLUDecomposition(
+              implementation.getColumnCompressed(false), 0, true)
+        val SparseMatrix L = new ColtSparseMatrix(lu.l)
+        val SparseMatrix U = new ColtSparseMatrix(lu.u)
+        return new LUDecomposition(L.readOnlyView, U.readOnlyView, new SparseLUSolver(lu))
+      }
+      default :
+        return StaticUtils::convertToColtSparseMatrix(this).lu()
+    }
+  }
+  
   @Data
-  private static class SparseSolver implements Solver {
+  private static class SparseCholeskySolver implements CholeskySolver {
     val CustomizedColtSparseDoubleCholesky implementation   
     override solve(Matrix b, SolverMode mode) {
       if (!b.isVector()) 
@@ -92,7 +113,21 @@ import xlinear.CholeskyDecomposition.SolverMode
       implementation.solve(copy, mode)
       return MatrixOperations::denseCopy(copy.toArray)
     }
-    
+  }
+  
+  @Data
+  private static class SparseLUSolver implements LUSolver {
+    val SparseDoubleLUDecomposition implementation   
+    override solve(Matrix b) {
+      if (!b.isVector()) 
+        throw StaticUtils::notAVectorException
+      val DenseDoubleMatrix1D copy = new DenseDoubleMatrix1D(b.nEntries)
+      for (var int i = 0; i < b.nEntries; i++) {
+        copy.set(i, b.get(i))
+      }
+      implementation.solve(copy)
+      return MatrixOperations::denseCopy(copy.toArray)
+    }
   }
   
   override int nRows() {

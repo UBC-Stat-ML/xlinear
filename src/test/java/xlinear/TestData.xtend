@@ -37,5 +37,11 @@ class TestData {
     #[ 0, -1,   2]
   ]
   
+  val public static double[][] smallNonSymExample = #[
+    #[ 2, -1,   1],
+    #[-1,  2,  -1],
+    #[ 0, -1,   2]
+  ]
+  
   
 }

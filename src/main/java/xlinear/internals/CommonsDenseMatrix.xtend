@@ -10,7 +10,6 @@ import xlinear.CholeskyDecomposition
 import org.apache.commons.math3.linear.RealMatrix
 import org.apache.commons.math3.linear.LUDecomposition
 import org.apache.commons.math3.exception.MathIllegalNumberException
-import xlinear.CholeskyDecomposition.Solver
 import xlinear.Matrix
 import xlinear.MatrixOperations
 import org.apache.commons.math3.linear.RealVector
@@ -18,6 +17,8 @@ import xlinear.CholeskyDecomposition.SolverMode
 import org.apache.commons.math3.linear.DecompositionSolver
 import org.apache.commons.math3.linear.MatrixUtils
 import xlinear.MatrixExtensions
+import xlinear.CholeskyDecomposition.CholeskySolver
+import xlinear.LUDecomposition.LUSolver
 
 @Data class CommonsDenseMatrix implements DenseMatrix {
   
@@ -62,14 +63,24 @@ import xlinear.MatrixExtensions
       val chol = 
         new org.apache.commons.math3.linear.CholeskyDecomposition(implementation)
       val DenseMatrix L = new CommonsDenseMatrix(chol.l).readOnlyView
-      return new CholeskyDecomposition(L, new DenseSolver(chol.solver, L))
+      return new CholeskyDecomposition(L, new DenseCholeskySolver(chol.solver, L))
     } catch (MathIllegalNumberException mine) {
       throw StaticUtils::notSymmetricPosDef
     }
   }
   
+  override xlinear.LUDecomposition lu() {
+    StaticUtils::checkMatrixIsSquare(this)
+    // TODO: attempt to use JEigen or JBlas if matrix is large
+    val lu = 
+      new org.apache.commons.math3.linear.LUDecomposition(implementation)
+    val DenseMatrix L = new CommonsDenseMatrix(lu.l).readOnlyView
+    val DenseMatrix U = new CommonsDenseMatrix(lu.u).readOnlyView
+    return new xlinear.LUDecomposition(L, U, new DenseLUSolver(lu.solver))
+  }
+  
   @Data
-  public static class DenseSolver implements Solver {
+  public static class DenseCholeskySolver implements CholeskySolver {
     val DecompositionSolver implementation
     val Matrix L
     override solve(Matrix b, SolverMode mode) {
@@ -93,7 +104,17 @@ import xlinear.MatrixExtensions
         }
       return MatrixOperations::denseCopy(solution)
     }
-    
+  }
+  
+  @Data
+  public static class DenseLUSolver implements LUSolver {
+    val DecompositionSolver implementation
+    override solve(Matrix b) {
+      if (!b.isVector()) 
+        throw StaticUtils::notAVectorException
+      val RealVector solution = implementation.solve(MatrixExtensions::toCommonsVector(b))
+      return MatrixOperations::denseCopy(solution)
+    }
   }
   
   override CommonsDenseMatrix inverse() {
