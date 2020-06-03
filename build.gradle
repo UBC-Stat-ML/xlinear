@@ -1,22 +1,18 @@
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'eclipse'
-apply plugin: "org.xtext.xtend"
+plugins {
+  id 'org.xtext.xtend' version '2.0.5'
+  id 'java'
+  id 'eclipse'
+  id 'maven'
+  id 'application'
+}
 
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "org.xtext:xtext-gradle-plugin:1.0.12"
+repositories {
+  mavenCentral()
+  maven {
+    url "https://plugins.gradle.org/m2/"
   }
 }
+
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -29,10 +25,6 @@ xtend {
 
 dependencies {
     compile files("lib/Jeigen-onefat.jar")
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
 }
 
 uploadArchives {
@@ -71,16 +63,6 @@ dependencies {
   compile group: 'net.java.dev.jna', name: 'jna', version: '4.2.2'
 }
 
-task(tutorialj, dependsOn: ['build','testClasses'], type: JavaExec) {
-  main = 'tutorialj.Main'
-  classpath {
-    configurations.compile
-    sourceSets.main.runtimeClasspath
-    sourceSets.test.runtimeClasspath
-  }
-}
-
-
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -91,10 +73,9 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from 'build/docs/javadoc'
 }
 
-artifacts {
-    archives jar
-    archives sourcesJar
-    archives javadocJar
+configurations.archives.with {
+  artifacts.remove artifacts.find { it.file =~ 'tar' }
+  artifacts.remove artifacts.find { it.file =~ 'zip' }
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
@@ -106,4 +87,10 @@ if (JavaVersion.current().isJava8Compatible()) {
             options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
+}
+
+artifacts {
+  archives jar
+  archives sourcesJar
+  archives javadocJar
 }
