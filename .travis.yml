@@ -4,4 +4,4 @@ script:
 jdk:
   - openjdk11
   - openjdk8
-install: travis_wait 30 ./gradlew installDist -i --stacktrace
+install: travis_wait 30 ./gradlew assemble -i --stacktrace
