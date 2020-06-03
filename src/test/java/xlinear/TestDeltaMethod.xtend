@@ -45,10 +45,10 @@ class TestDeltaMethod {
   
   @Test
   def void testAsymptoticVariance() {
-    val delta = new DeltaMethod(generateData(10000000), transform) 
+    val delta = new DeltaMethod(generateData(100000), transform) 
     val numerical = delta.asymptoticVariance
     val analytical = mu2 * mu2 * cov.get(0,0) + 2.0 * mu1 * mu2 * cov.get(0,1) + mu1 * mu1 * cov.get(1,1)
-    Assert.assertEquals(numerical, analytical, 0.1)
+    Assert.assertEquals(numerical, analytical, 0.3)
   }
   
   @Test
