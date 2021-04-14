@@ -5,6 +5,7 @@ import static xlinear.MatrixOperations.*
 import xlinear.DenseMatrix
 import xlinear.Matrix
 import java.util.List
+import java.util.ArrayList
 
 class AutoDiff {
   
@@ -23,11 +24,12 @@ class AutoDiff {
   
   def static DerivativeStructure autoDiff(Matrix point, int order, Differentiable function) {
     val dim = point.nEntries
-    val DerivativeStructure [] args = newArrayOfSize(dim)
+    val List<DerivativeStructure> args = new ArrayList(dim)
     for (i : 0 ..< dim)
-      args.set(i, new DerivativeStructure(dim, order, i, point.get(i)))
+      args.add(new DerivativeStructure(dim, order, i, point.get(i)))
     return function.apply(args) 
   }
+
   
   def static DenseMatrix gradient(Matrix point, Differentiable f) {
     return gradient(autoDiff(point, f))
