@@ -103,6 +103,15 @@ class MatrixExtensions {
     }
     return m.get(0,0)
   }
+  
+  
+  //// Cast scalar to 1x1
+  
+  def static DenseMatrix asMatrix(double value) {
+    val result = MatrixOperations::dense(1)
+    result.set(0, value)
+    return result
+  }
 
 
   //// Dimensionality shortcuts

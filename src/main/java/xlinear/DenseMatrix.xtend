@@ -18,6 +18,25 @@ interface DenseMatrix extends Matrix {
   def void visit(MatrixVisitorViewOnly visitor)
   def void editInPlace(MatrixVisitorEditInPlace visitor)
   
+  def void editInPlace((double)=>double visitor) {
+    val MatrixVisitorEditInPlace transf = [r, c, v|visitor.apply(v)]
+    editInPlace(transf)
+  }
+  
+  def DenseMatrix pointwise((double)=>double operation) {
+    val result = createEmpty(nRows, nCols)
+    val MatrixVisitorEditInPlace transf = [r, c, v|operation.apply(get(r, c))]
+    result.editInPlace(transf)
+    return result
+  }
+  
+  def DenseMatrix pointwise(DenseMatrix another, (double, double)=>double operation) {
+    val result = createEmpty(nRows, nCols)
+    val MatrixVisitorEditInPlace transf = [r, c, v|operation.apply(get(r, c), another.get(r, c))]
+    result.editInPlace(transf)
+    return result
+  }
+  
   override DenseMatrix createEmpty(int nRows, int nCols)
     
   override CholeskyDecomposition cholesky() {
@@ -48,6 +67,16 @@ interface DenseMatrix extends Matrix {
         IntStream.range(0, nRows).mapToObj[int row | this.row(row)].flatMapToDouble[Matrix rowMatrix | rowMatrix.nonZeroEntries()]
       }
     return result.filter[double entry | entry != 0.0]
+  }
+  
+  def DoubleStream entries() {
+    val DoubleStream result = 
+      if (isVector) {
+        IntStream.range(0, nEntries).mapToDouble[int entry | this.get(entry)]
+      } else {
+        IntStream.range(0, nRows).mapToObj[int row | this.row(row)].flatMapToDouble[DenseMatrix rowMatrix | rowMatrix.entries()]
+      }
+    return result
   }
   
   //// scalar * or /
