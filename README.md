@@ -1,4 +1,4 @@
-Summary [![Build Status](https://travis-ci.org/alexandrebouchard/xlinear.png?branch=master)](https://api.travis-ci.org/alexandrebouchard/xlinear) 
+Summary 
 -------
 
 There are several excellent linear algebra libraries for Java, but they generally have a 
